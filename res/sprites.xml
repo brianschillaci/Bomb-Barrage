@@ -1,0 +1,14 @@
+<TextureAtlas imagePath = "bombermansprites.png">
+    <SubTexture name = 'standback.png' x ="0" y="7" width="16" height="30"/>
+    <SubTexture name = 'walkbackr.png' x ="16" y="7" width="16" height="30"/>
+    <SubTexture name = 'walkbackl.png' x ="32" y="7" width="16" height="30"/>
+    <SubTexture name = 'standright.png' x ="0" y="39" width="16" height="30"/>
+    <SubTexture name = 'walkrightl.png' x ="16" y="39" width="16" height="30"/>
+    <SubTexture name = 'walkrightr.png' x ="32" y="39" width="16" height="30"/>
+    <SubTexture name = 'standforward.png' x ="0" y="68" width="16" height="30"/>
+    <SubTexture name = 'walkforwardr.png' x ="16" y="68" width="16" height="30"/>
+    <SubTexture name = 'walkforwardl.png' x ="32" y="68" width="16" height="30"/>
+    <SubTexture name = 'standleft.png' x ="0" y="100" width="16" height="30"/>
+    <SubTexture name = 'walkleftl.png' x ="16" y="100" width="16" height="30"/>
+    <SubTexture name = 'walkleftr.png' x ="32" y="100" width="16" height="30"/>
+</TextureAtlas>
