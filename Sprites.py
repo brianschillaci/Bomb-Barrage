@@ -78,15 +78,15 @@ class Player(pygame.sprite.Sprite):
 
     def load_player_images(self):
         self.standing_frames = [pygame.transform.scale(self.spritesheet.get_image(0, 66, 16, 32), (32, 64)),
-                                pygame.transform.scale(self.spritesheet.get_image(0, 35, 16, 32), (32, 64)),
+                                pygame.transform.scale(self.spritesheet.get_image(0, 37, 16, 30), (32, 64)),
                                 pygame.transform.scale(self.spritesheet.get_image(0, 98, 16, 32), (32, 64)),
                                 pygame.transform.scale(self.spritesheet.get_image(0, 5, 16, 32), (32, 64))]
         for frame in self.standing_frames:
             frame.set_colorkey(WHITE)
 
-        self.walk_frames_r = [pygame.transform.scale(self.spritesheet.get_image(0, 35, 16, 32), (32, 64)),
-                              pygame.transform.scale(self.spritesheet.get_image(16, 35, 16, 32), (32, 64)),
-                              pygame.transform.scale(self.spritesheet.get_image(32, 35, 16, 32), (32, 64))]
+        self.walk_frames_r = [pygame.transform.scale(self.spritesheet.get_image(0, 37, 16, 30), (32, 64)),
+                              pygame.transform.scale(self.spritesheet.get_image(16, 37, 16, 30), (32, 64)),
+                              pygame.transform.scale(self.spritesheet.get_image(32, 37, 16, 30), (32, 64))]
         for frame in self.walk_frames_r:
             frame.set_colorkey(WHITE)
 
