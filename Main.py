@@ -1,6 +1,5 @@
 import pygame
-
-from Settings import WIDTH, HEIGHT, TITLE, WHITE
+from Settings import WIDTH, HEIGHT, TITLE, WHITE, BLACK
 from Sprites import Player
 
 pygame.init()
@@ -38,7 +37,7 @@ while carryOn:
     all_sprites.update()
 
     pygame.display.flip()
-    screen.fill(WHITE)
+    screen.fill(BLACK)
     clock.tick(60)
 
 pygame.quit()

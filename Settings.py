@@ -5,7 +5,7 @@ FPS = 60
 RESOURCE_FOLDER = "res"
 SPRITESHEET = "bombermansprites.png"
 # The lower the number, the faster the animation
-ANIMATION_SPEED = 100
+ANIMATION_SPEED = 90
 
 
 # define colors

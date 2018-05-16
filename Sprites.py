@@ -1,11 +1,25 @@
 from os import path
 from typing import List
-
 import pygame
-
 from Settings import SPRITESHEET, WHITE, RESOURCE_FOLDER, ANIMATION_SPEED
 
-vec = pygame.math.Vector2
+
+class UnbreakableRock(pygame.sprite.Sprite):
+    def __init__(self):
+        # Calling super constructor for the Sprite class, since we are extending the Sprite class
+        pygame.sprite.Sprite.__init__(self)
+
+
+class BreakableRock(pygame.sprite.Sprite):
+    def __init__(self):
+        # Calling super constructor for the Sprite class, since we are extending the Sprite class
+        pygame.sprite.Sprite.__init__(self)
+
+
+class Bomb(pygame.sprite.Sprite):
+    def __init__(self):
+        # Calling super constructor for the Sprite class, since we are extending the Sprite class
+        pygame.sprite.Sprite.__init__(self)
 
 
 class Spritesheet:
@@ -16,8 +30,9 @@ class Spritesheet:
     def get_image(self, x: object, y: object, width: object, height: object) -> object:
         image = pygame.Surface((width, height))
         image.blit(self.spritesheet, (0, 0), (x, y, width, height))
-        image = pygame.transform.scale(image, (width // 2, height // 2))
+        image = pygame.transform.scale(image, (width, height))
         return image
+
 
 class Player(pygame.sprite.Sprite):
     standing_frames: List[None]
@@ -62,34 +77,34 @@ class Player(pygame.sprite.Sprite):
     # End of constructor for Player object
 
     def load_player_images(self):
-        self.standing_frames = [pygame.transform.scale(self.spritesheet.get_image(0, 68, 16, 30), (32, 64)),
-                                pygame.transform.scale(self.spritesheet.get_image(0, 39, 16, 30), (32, 64)),
-                                pygame.transform.scale(self.spritesheet.get_image(0, 100, 16, 30), (32, 64)),
-                                pygame.transform.scale(self.spritesheet.get_image(0, 7, 16, 30), (32, 64))]
+        self.standing_frames = [pygame.transform.scale(self.spritesheet.get_image(0, 66, 16, 32), (32, 64)),
+                                pygame.transform.scale(self.spritesheet.get_image(0, 35, 16, 32), (32, 64)),
+                                pygame.transform.scale(self.spritesheet.get_image(0, 98, 16, 32), (32, 64)),
+                                pygame.transform.scale(self.spritesheet.get_image(0, 5, 16, 32), (32, 64))]
         for frame in self.standing_frames:
             frame.set_colorkey(WHITE)
 
-        self.walk_frames_r = [pygame.transform.scale(self.spritesheet.get_image(0, 39, 16, 30), (32, 64)),
-                              pygame.transform.scale(self.spritesheet.get_image(16, 39, 16, 30), (32, 64)),
-                              pygame.transform.scale(self.spritesheet.get_image(32, 39, 16, 30), (32, 64))]
+        self.walk_frames_r = [pygame.transform.scale(self.spritesheet.get_image(0, 35, 16, 32), (32, 64)),
+                              pygame.transform.scale(self.spritesheet.get_image(16, 35, 16, 32), (32, 64)),
+                              pygame.transform.scale(self.spritesheet.get_image(32, 35, 16, 32), (32, 64))]
         for frame in self.walk_frames_r:
             frame.set_colorkey(WHITE)
 
-        self.walk_frames_l = [pygame.transform.scale(self.spritesheet.get_image(0, 100, 16, 30), (32, 64)),
-                              pygame.transform.scale(self.spritesheet.get_image(16, 100, 16, 30), (32, 64)),
-                              pygame.transform.scale(self.spritesheet.get_image(32, 100, 16, 30), (32, 64))]
+        self.walk_frames_l = [pygame.transform.scale(self.spritesheet.get_image(0, 98, 16, 32), (32, 64)),
+                              pygame.transform.scale(self.spritesheet.get_image(16, 98, 16, 32), (32, 64)),
+                              pygame.transform.scale(self.spritesheet.get_image(32, 98, 16, 32), (32, 64))]
         for frame in self.walk_frames_l:
             frame.set_colorkey(WHITE)
 
-        self.walk_frames_forward = [pygame.transform.scale(self.spritesheet.get_image(0, 7, 16, 30), (32, 64)),
-                                    pygame.transform.scale(self.spritesheet.get_image(16, 7, 16, 30), (32, 64)),
-                                    pygame.transform.scale(self.spritesheet.get_image(32, 7, 16, 30), (32, 64))]
+        self.walk_frames_forward = [pygame.transform.scale(self.spritesheet.get_image(0, 5, 16, 32), (32, 64)),
+                                    pygame.transform.scale(self.spritesheet.get_image(16, 5, 16, 32), (32, 64)),
+                                    pygame.transform.scale(self.spritesheet.get_image(32, 5, 16, 32), (32, 64))]
         for frame in self.walk_frames_forward:
             frame.set_colorkey(WHITE)
 
-        self.walk_frames_back = [pygame.transform.scale(self.spritesheet.get_image(0, 68, 16, 30), (32, 64)),
-                                 pygame.transform.scale(self.spritesheet.get_image(16, 68, 16, 30), (32, 64)),
-                                 pygame.transform.scale(self.spritesheet.get_image(32, 68, 16, 30), (32, 64))]
+        self.walk_frames_back = [pygame.transform.scale(self.spritesheet.get_image(0, 66, 16, 32), (32, 64)),
+                                 pygame.transform.scale(self.spritesheet.get_image(16, 66, 16, 32), (32, 64)),
+                                 pygame.transform.scale(self.spritesheet.get_image(32, 66, 16, 32), (32, 64))]
         for frame in self.walk_frames_back:
             frame.set_colorkey(WHITE)
 
