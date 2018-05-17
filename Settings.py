@@ -4,6 +4,8 @@ HEIGHT = 600
 FPS = 60
 RESOURCE_FOLDER = "res"
 SPRITESHEET = "bombermansprites.png"
+BOMBSPRITESHEET = "bombs.png"
+
 # The lower the number, the faster the animation
 ANIMATION_SPEED = 90
 
