@@ -4,6 +4,8 @@ from Settings import WIDTH, HEIGHT, TITLE, WHITE, BLACK, RESOURCE_FOLDER, SPRITE
 from Sprites import Player, Bomb, Explosion, Spritesheet, SuperExplosion
 
 # Initialization function needed by Pygame
+from Utilities import drop_bomb
+
 pygame.init()
 
 # Size of the screen/window for the game
@@ -108,28 +110,22 @@ while carryOn:
     # The user can use WASD or the arrow keys in order to move their character
     if keys[pygame.K_LEFT] or keys[pygame.K_a]:
         player1.walk_left()
+        if keys[pygame.K_SPACE]:
+            drop_bomb(player1, bombspritesheet, otherSprites, bomb_set)
     elif keys[pygame.K_RIGHT] or keys[pygame.K_d]:
         player1.walk_right()
+        if keys[pygame.K_SPACE]:
+            drop_bomb(player1, bombspritesheet, otherSprites, bomb_set)
     elif keys[pygame.K_UP] or keys[pygame.K_w]:
         player1.walk_forward()
+        if keys[pygame.K_SPACE]:
+            drop_bomb(player1, bombspritesheet, otherSprites, bomb_set)
     elif keys[pygame.K_DOWN] or keys[pygame.K_s]:
         player1.walk_backward()
-    # Space button is used to drop bombs
+        if keys[pygame.K_SPACE]:
+            drop_bomb(player1, bombspritesheet, otherSprites, bomb_set)
     elif keys[pygame.K_SPACE]:
-        now = pygame.time.get_ticks()
-        # Drop a bomb only if sufficient amount of time has passed since the last bomb was dropped
-        if now - player1.lastBombPlacementTime > 2000 and player1.place_bomb():
-            # Update the player's last bomb drop time
-            player1.lastBombPlacementTime = now
-            # Create a new bomb object and add to the bomb set and sprites list
-            bomb = Bomb(player1, bombspritesheet)
-            otherSprites.add(bomb)
-            bomb_set.add(bomb)
-            # Update the location of the bomb to the (x,y) of where the player dropped it
-            bomb.rect.x = player1.rect.x
-            bomb.rect.y = player1.rect.y + 20
-            # Re-animate the player
-            player1.animate_player()
+        drop_bomb(player1, bombspritesheet, otherSprites, bomb_set)
     else:
         player1.walking = False
         player1.placingBomb = False

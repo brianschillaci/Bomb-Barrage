@@ -188,7 +188,6 @@ class Bomb(pygame.sprite.Sprite):
         self.time -= time
         # Animate the explosion if the time is right
         if self.time <= -500:
-            print('explosion')
             return True
         else:
             return False
