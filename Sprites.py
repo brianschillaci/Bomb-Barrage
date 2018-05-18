@@ -1,13 +1,133 @@
 from os import path
 from typing import List
 import pygame
-from Settings import SPRITESHEET, WHITE, RESOURCE_FOLDER, ANIMATION_SPEED, BOMBSPRITESHEET
+from Settings import SPRITESHEET, WHITE, RESOURCE_FOLDER, ANIMATION_SPEED, CUSTOM
+
+
+class Explosion(pygame.sprite.Sprite):
+    def __init__(self, x, y, width, height, bombRectX, bombRectY, xAmountToAdd, yAmountToAdd, spriteSheet, rotateBool):
+        # Calling super constructor for the Sprite class, since we are extending the Sprite class
+        pygame.sprite.Sprite.__init__(self)
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+
+        self.image = pygame.transform.scale(spriteSheet.get_image(self.x, self.y, self.width, self.height), (32, 32))
+        self.image.set_colorkey(WHITE)
+        self.rect = self.image.get_rect()
+        self.rect.x = bombRectX
+        self.rect.y = bombRectY
+
+        self.rect.x += xAmountToAdd
+        self.rect.y += yAmountToAdd
+        if rotateBool:
+            self.image = pygame.transform.rotate(self.image, 180)
+
+
+class SuperExplosion:
+    explosionList = list()
+    toRemoveAtEnd = list()
+
+    def __init__(self, time, rectX, rectY, bombspritesheet):
+        self.time = 400
+        self.originX = rectX
+        self.originY = rectY
+        self.bombspritesheet = bombspritesheet
+        self.bool1 = False
+        self.bool2 = False
+        self.bool3 = False
+        self.bool4 = False
+        self.bool5 = False
+        self.bool6 = False
+        self.update_explosion_list(time)
+
+    def update_explosion_list(self, time):
+        self.time -= time
+        if self.time >= 380:
+            if self.bool1 is True:
+                return True
+            explosion_square1 = Explosion(102, 85, 16, 16, self.originX, self.originY, 0, 0, self.bombspritesheet, False)
+            self.explosionList.clear()
+            self.explosionList.append(explosion_square1)
+            self.toRemoveAtEnd.append(explosion_square1)
+            self.bool1 = True
+            return True
+        elif self.time >= 360:
+            if self.bool2 is True:
+                return True
+            explosion_square1 = Explosion(85, 85, 16, 16, self.originX, self.originY, 0, 0, self.bombspritesheet, False)
+            self.explosionList.clear()
+            self.explosionList.append(explosion_square1)
+            self.toRemoveAtEnd.append(explosion_square1)
+            self.bool2 = True
+            print(self.explosionList)
+            return True
+        elif self.time >= 340:
+            if self.bool3 is True:
+                return True
+            explosion_square1 = Explosion(68, 85, 16, 16, self.originX, self.originY, 0, 0, self.bombspritesheet, False)
+            self.explosionList.clear()
+            self.explosionList.append(explosion_square1)
+            self.toRemoveAtEnd.append(explosion_square1)
+            self.bool3 = True
+            print(self.explosionList)
+            return True
+        elif self.time >= 320:
+            if self.bool5 is True:
+                return True
+
+            self.explosionList.clear()
+            # Center explosion
+            explosionSquare1 = Explosion(85, 17, 16, 16, self.originX, self.originY, 0, 0, self.bombspritesheet, False)
+            # First 4 squares
+            explosionSquare2 = Explosion(68, 17, 16, 16, self.originX, self.originY, -32, 0, self.bombspritesheet,
+                                         False)
+            explosionSquare3 = Explosion(51, 17, 16, 16, self.originX, self.originY, 0, -32, self.bombspritesheet,
+                                         False)
+            explosionSquare4 = Explosion(68, 17, 16, 16, self.originX, self.originY, 32, 0, self.bombspritesheet, False)
+            explosionSquare5 = Explosion(51, 17, 16, 16, self.originX, self.originY, 0, 32, self.bombspritesheet, False)
+            # Second 4 squares
+            explosionSquare6 = Explosion(34, 17, 16, 16, self.originX, self.originY, -64, 0, self.bombspritesheet, True)
+            explosionSquare7 = Explosion(0, 17, 16, 16, self.originX, self.originY, 0, -64, self.bombspritesheet, False)
+            explosionSquare8 = Explosion(34, 17, 16, 16, self.originX, self.originY, 64, 0, self.bombspritesheet, False)
+            explosionSquare9 = Explosion(0, 17, 16, 16, self.originX, self.originY, 0, 64, self.bombspritesheet, True)
+            self.explosionList.append(explosionSquare1)
+            self.explosionList.append(explosionSquare2)
+            self.explosionList.append(explosionSquare3)
+            self.explosionList.append(explosionSquare4)
+            self.explosionList.append(explosionSquare5)
+            self.toRemoveAtEnd.append(explosionSquare1)
+            self.toRemoveAtEnd.append(explosionSquare2)
+            self.toRemoveAtEnd.append(explosionSquare3)
+            self.toRemoveAtEnd.append(explosionSquare4)
+            self.toRemoveAtEnd.append(explosionSquare5)
+            self.explosionList.append(explosionSquare6)
+            self.explosionList.append(explosionSquare7)
+            self.explosionList.append(explosionSquare8)
+            self.explosionList.append(explosionSquare9)
+            self.toRemoveAtEnd.append(explosionSquare6)
+            self.toRemoveAtEnd.append(explosionSquare7)
+            self.toRemoveAtEnd.append(explosionSquare8)
+            self.toRemoveAtEnd.append(explosionSquare9)
+            self.bool5 = True
+            return True
+        elif self.time >= 240:
+            if self.bool6 is True:
+                return True
+            # Done with the explosion
+            self.bool6 = True
+            print(self.explosionList)
+            return True
+        else:
+            return False
 
 
 class UnbreakableRock(pygame.sprite.Sprite):
     """
     Not started yet.
     """
+
     def __init__(self):
         # Calling super constructor for the Sprite class, since we are extending the Sprite class
         pygame.sprite.Sprite.__init__(self)
@@ -17,6 +137,7 @@ class BreakableRock(pygame.sprite.Sprite):
     """
     Not started yet.
     """
+
     def __init__(self):
         """
 
@@ -28,7 +149,7 @@ class BreakableRock(pygame.sprite.Sprite):
 class Bomb(pygame.sprite.Sprite):
     bomb_place_frames: List[None]
 
-    def __init__(self):
+    def __init__(self, spritesheet):
         """
         Constructor for a Bomb object.
         Initializes the bomb image, time, and background pygame.rect object.
@@ -39,12 +160,8 @@ class Bomb(pygame.sprite.Sprite):
         # Time until the bomb explodes - in seconds
         self.time = 400
 
-        self.dir = path.dirname(__file__)
-        img_dir = path.join(self.dir, RESOURCE_FOLDER)
-        self.bombspritesheet = Spritesheet(path.join(img_dir, BOMBSPRITESHEET))
-
-        self.image = pygame.transform.scale(self.bombspritesheet.get_image(0, 0, 16, 16), (32, 32))
-
+        self.image = pygame.transform.scale(spritesheet.get_image(0, 0, 16, 16), (32, 32))
+        self.image.set_colorkey(WHITE)
         self.rect = self.image.get_rect()
 
     def animate(self, time):
@@ -60,9 +177,6 @@ class Bomb(pygame.sprite.Sprite):
         # Animate the explosion if the time is right
         if self.time <= -500:
             print('explosion')
-            # Need to determine where all the bomb explosion images need to appear, and also see if they collide with
-            # anything
-            self.image = pygame.transform.scale(self.bombspritesheet.get_image(17, 17, 16, 16), (32, 32))
             return True
         else:
             return False
@@ -269,4 +383,3 @@ class Player(pygame.sprite.Sprite):
         self.reset_walking_booleans()
         self.placingBomb = True
         return True
-
