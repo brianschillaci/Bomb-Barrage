@@ -1,5 +1,4 @@
 from os import path
-
 import pygame
 from Settings import WIDTH, HEIGHT, TITLE, WHITE, BLACK, RESOURCE_FOLDER, SPRITESHEET, BOMBSPRITESHEET, CUSTOM
 from Sprites import Player, Bomb, Explosion, Spritesheet, SuperExplosion
@@ -52,7 +51,7 @@ spritesheet = Spritesheet(path.join(img_dir, SPRITESHEET))
 bombspritesheet = Spritesheet(path.join(img_dir, BOMBSPRITESHEET))
 
 while carryOn:
-    time = clock.tick(100)
+    time = clock.tick(60)
     # Close the game if someone exits the screen.
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -83,17 +82,19 @@ while carryOn:
         otherSprites.remove(bomb)
 
         # Now that this bomb is removed, we need to animate the explosion to take it's place
-        explosion = SuperExplosion(time, bomb.rect.x, bomb.rect.y, bombspritesheet)
+        explosion = SuperExplosion(player1, time, bomb.rect.x, bomb.rect.y, bombspritesheet)
         explosion_set.add(explosion)
 
     bombs_to_remove.clear()
     # Check if any explosions need to update their animation and also if they are done
     for explosion in explosion_set:
         explosionDoneBool = explosion.update_explosion_list(time)
+        # If the explosion isn't done, load the next set of sprites for it
         if explosionDoneBool:
             for sub_explosion in explosion.explosionList:
                 if not otherSprites.has(sub_explosion):
                     otherSprites.add(sub_explosion)
+        # The explosion is done, add to the explosion remove list
         else:
             explosions_to_remove.add(explosion)
             for subExplosion in explosion.toRemoveAtEnd:
@@ -121,7 +122,7 @@ while carryOn:
             # Update the player's last bomb drop time
             player1.lastBombPlacementTime = now
             # Create a new bomb object and add to the bomb set and sprites list
-            bomb = Bomb(bombspritesheet)
+            bomb = Bomb(player1, bombspritesheet)
             otherSprites.add(bomb)
             bomb_set.add(bomb)
             # Update the location of the bomb to the (x,y) of where the player dropped it
