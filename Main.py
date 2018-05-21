@@ -1,7 +1,7 @@
 from os import path
 import pygame
 from Settings import WIDTH, HEIGHT, TITLE, WHITE, BLACK, RESOURCE_FOLDER, SPRITESHEET, BOMBSPRITESHEET, CUSTOM
-from Sprites import Player, Bomb, Explosion, Spritesheet, SuperExplosion
+from Sprites import Player, Bomb, Explosion, Spritesheet, SuperExplosion, Wall
 
 # Initialization function needed by Pygame
 from Utilities import drop_bomb
@@ -16,6 +16,7 @@ screen = pygame.display.set_mode(size)
 
 # Setting the title of the game which appears in the top bar of the application
 pygame.display.set_caption(TITLE)
+
 
 # Boolean value that keeps the game running until someone wins or the game is closed
 carryOn = True
@@ -41,6 +42,19 @@ bomb_set = set()
 # Set of all explosions active
 explosion_set = set()
 
+# create sprite for collision detection  ( all this wall sprites are meant for detecting collissions)
+walls = pygame.sprite.Group()
+
+wall_1 = Wall("LIGHTBLUE", 0, 0, WIDTH, 5 )
+wall_2 = Wall("LIGHTBLUE", 0, 0, 5, HEIGHT )
+wall_3 = Wall("LIGHTBLUE", 0, HEIGHT-5, WIDTH, 5 )
+wall_4 = Wall("LIGHTBLUE", WIDTH-5, 0, 5, HEIGHT )
+
+walls.add(wall_1, wall_2, wall_3, wall_4)
+
+
+
+
 # Set of bombs that have exploded at a certain frame and need to be removed from the bomb_set and the all_sprites list
 bombs_to_remove = set()
 
@@ -62,12 +76,20 @@ while carryOn:
             if event.key == pygame.K_x:
                 carryOn = False
 
+    #check for collissions in all the four corners of the screen
+    collission_1 = pygame.sprite.spritecollideany(wall_1, playerSprites)
+    collission_2 = pygame.sprite.spritecollideany(wall_2,playerSprites)
+    collission_3 = pygame.sprite.spritecollideany(wall_3,playerSprites)
+    collission_4 = pygame.sprite.spritecollideany(wall_4, playerSprites)
+
+
     # Get the key that waas pressed by the user.
     keys = pygame.key.get_pressed()
 
     # Draw all of the sprites on the screen.
     otherSprites.draw(screen)
     playerSprites.draw(screen)
+    walls.draw(screen)
 
     # Check if any bombs on the screen have expired and are ready to explode.
     for bomb in bomb_set:
@@ -109,19 +131,31 @@ while carryOn:
     # If else statements for all the possible user inputs, for both movement and combat
     # The user can use WASD or the arrow keys in order to move their character
     if keys[pygame.K_LEFT] or keys[pygame.K_a]:
-        player1.walk_left()
+        if collission_2 is not None:
+            player1.walk_left(False)
+        else:
+            player1.walk_left(True)
         if keys[pygame.K_SPACE]:
             drop_bomb(player1, bombspritesheet, otherSprites, bomb_set)
     elif keys[pygame.K_RIGHT] or keys[pygame.K_d]:
-        player1.walk_right()
+        if collission_4 is not None:    #check for collission
+            player1.walk_right(False)
+        else:
+            player1.walk_right(True)
         if keys[pygame.K_SPACE]:
             drop_bomb(player1, bombspritesheet, otherSprites, bomb_set)
     elif keys[pygame.K_UP] or keys[pygame.K_w]:
-        player1.walk_forward()
+        if collission_1 is not None:     #check for collission
+            player1.walk_forward(False)
+        else:
+            player1.walk_forward(True)
         if keys[pygame.K_SPACE]:
             drop_bomb(player1, bombspritesheet, otherSprites, bomb_set)
     elif keys[pygame.K_DOWN] or keys[pygame.K_s]:
-        player1.walk_backward()
+        if collission_3 is not None:     #check for collission
+            player1.walk_backward(False)
+        else:
+            player1.walk_backward(True)
         if keys[pygame.K_SPACE]:
             drop_bomb(player1, bombspritesheet, otherSprites, bomb_set)
     elif keys[pygame.K_SPACE]:

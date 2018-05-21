@@ -218,6 +218,19 @@ class Spritesheet:
         return image
 
 
+class Wall(pygame.sprite.Sprite):
+
+    def __init__(self, color, x, y, width, height):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.Surface([width, height])
+        self.image.fill(pygame.color.Color(color))
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+
+
+
+
 class Player(pygame.sprite.Sprite):
     # Lists of frames for the different animations for the player object
     standing_frames: List[None]
@@ -312,6 +325,7 @@ class Player(pygame.sprite.Sprite):
 
     # End of load_images() function
 
+
     def animate_player(self):
         """
         This function will animate the movement/non-movement of a player object.
@@ -358,28 +372,51 @@ class Player(pygame.sprite.Sprite):
                 self.current_frame = 0
             self.image = self.standing_frames[self.current_frame]
 
-    def walk_right(self):
+    def walk_right(self,walk):
         self.reset_walking_booleans()
-        self.walking = True
-        self.walkingRight = True
+
+        if walk:
+            self.walking = True
+            self.walkingRight = True
+        else:
+            self.walking = False
+            self.walkingRight = False
+
         self.animate_player()
 
-    def walk_forward(self):
+    def walk_forward(self, walk):
         self.reset_walking_booleans()
-        self.walking = True
-        self.walkingForward = True
+
+        if walk:
+            self.walking = True
+            self.walkingForward = True
+        else:
+            self.walking = False
+            self.walkingForward = False
+
         self.animate_player()
 
-    def walk_left(self):
+    def walk_left(self, walk):
         self.reset_walking_booleans()
-        self.walking = True
-        self.walkingLeft = True
+
+        if walk:
+            self.walking = True
+            self.walkingLeft = True
+        else:
+            self.walking = False
+            self.walkingLeft = False
         self.animate_player()
 
-    def walk_backward(self):
+    def walk_backward(self, walk):
         self.reset_walking_booleans()
-        self.walking = True
-        self.walkingBackward = True
+
+        if walk:
+            self.walking = True
+            self.walkingBackward = True
+        else:
+            self.walking = False
+            self.walkingBackward = False
+
         self.animate_player()
 
     def reset_walking_booleans(self):
