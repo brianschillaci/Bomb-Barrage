@@ -1,6 +1,7 @@
 from os import path
+from gui_game_board import GUIGameBoard as GBoard
 import pygame
-from Settings import WIDTH, HEIGHT, TITLE, WHITE, BLACK, RESOURCE_FOLDER, SPRITESHEET, BOMBSPRITESHEET, CUSTOM
+from Settings import WIDTH, HEIGHT, TITLE, WHITE, BLACK, RESOURCE_FOLDER, SPRITESHEET, BOMBSPRITESHEET, CUSTOM, GAME_BOARD, DEFAULT_THEME
 from Sprites import Player, Bomb, Explosion, Spritesheet, SuperExplosion, Wall
 
 # Initialization function needed by Pygame
@@ -17,6 +18,8 @@ screen = pygame.display.set_mode(size)
 # Setting the title of the game which appears in the top bar of the application
 pygame.display.set_caption(TITLE)
 
+# Initialize the gui_game_board for drawing the static background on screen.
+gboard = GBoard(screen, DEFAULT_THEME, GAME_BOARD)
 
 # Boolean value that keeps the game running until someone wins or the game is closed
 carryOn = True
@@ -75,6 +78,8 @@ while carryOn:
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_x:
                 carryOn = False
+
+    gboard.update_screen()
 
     #check for collissions in all the four corners of the screen
     collission_1 = pygame.sprite.spritecollideany(wall_1, playerSprites)

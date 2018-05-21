@@ -1,10 +1,12 @@
 TITLE = "Bomberman"
 WIDTH = 800
-HEIGHT = 600
+HEIGHT = 800
 FPS = 60
 RESOURCE_FOLDER = "res"
 SPRITESHEET = "bombermansprites.png"
 BOMBSPRITESHEET = "bombs.png"
+GAME_BOARD = "boards/default.brd"
+DEFAULT_THEME = "themes/default.cfg"
 
 # The lower the number, the faster the animation
 ANIMATION_SPEED = 90
