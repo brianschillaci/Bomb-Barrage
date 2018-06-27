@@ -113,6 +113,9 @@ while carryOn:
     collission_4 = pygame.sprite.spritecollideany(wall_4, playerSprites)
 
     # TODO - collisions with players and rocks
+    player1_and_unbreakable_rocks = pygame.sprite.spritecollideany(player1, unbreakableRocks)
+    player1_and_breakable_rocks = pygame.sprite.spritecollideany(player1, breakableRocks)
+
     # TODO - collisions with rocks and explosions
     # TODO - collisions with explosions and players
     # TODO - collisions with players and other players
@@ -166,31 +169,33 @@ while carryOn:
         explosion_set -= explosions_to_remove
 
     explosions_to_remove.clear()
+
+    rock_walking_collision = player1_and_breakable_rocks is not None or player1_and_unbreakable_rocks is not None
     # If else statements for all the possible user inputs, for both movement and combat
     # The user can use WASD or the arrow keys in order to move their character
     if keys[pygame.K_LEFT] or keys[pygame.K_a]:
-        if collission_2 is not None:
+        if collission_2 is not None or rock_walking_collision:
             player1.walk_left(False)
         else:
             player1.walk_left(True)
         if keys[pygame.K_SPACE]:
             drop_bomb(player1, bombspritesheet, otherSprites, bomb_set)
     elif keys[pygame.K_RIGHT] or keys[pygame.K_d]:
-        if collission_4 is not None:
+        if collission_4 is not None or rock_walking_collision:
             player1.walk_right(False)
         else:
             player1.walk_right(True)
         if keys[pygame.K_SPACE]:
             drop_bomb(player1, bombspritesheet, otherSprites, bomb_set)
     elif keys[pygame.K_UP] or keys[pygame.K_w]:
-        if collission_1 is not None:
+        if collission_1 is not None or rock_walking_collision:
             player1.walk_forward(False)
         else:
             player1.walk_forward(True)
         if keys[pygame.K_SPACE]:
             drop_bomb(player1, bombspritesheet, otherSprites, bomb_set)
     elif keys[pygame.K_DOWN] or keys[pygame.K_s]:
-        if collission_3 is not None:
+        if collission_3 is not None or rock_walking_collision:
             player1.walk_backward(False)
         else:
             player1.walk_backward(True)
@@ -201,7 +206,7 @@ while carryOn:
     else:
         player1.walking = False
         player1.placingBomb = False
-        player1.animate_player()
+        player1.animate_player(0)
 
     # These 4 statements will redraw the game, both the background and the sprites on top of the background
     unbreakableRocks.update()
