@@ -21,10 +21,9 @@ class GUIGameBoard(game_board.GameBoard):
         self.box_drawing_map = None
         self.box_width = 0
         self.read_drawing_map(box_drawing_map_path)
-        self.initialize_images()
+        self.initialize()
 
     def read_drawing_map(self, box_drawing_map_path):
-
         fd = open(box_drawing_map_path, 'r')
         lines = [line.strip() for line in fd.readlines()]
         fd.close()
@@ -35,15 +34,41 @@ class GUIGameBoard(game_board.GameBoard):
             words = line.split()
             if words[1] == "color":
                 color = (int(words[2]), int(words[3]), int(words[4]))
-                box_drawing_map.update({words[0]: [words[1], color, None]})
+                box_drawing_map.update({words[0]: [words[1], color, None, words[3], words[4], words[5]]})
             else:
-                box_drawing_map.update({words[0]: [words[1], words[2], None]})
+                box_drawing_map.update({words[0]: [words[1], words[2], None, words[3], words[4], words[5]]})
 
         self.box_drawing_map = box_drawing_map
 
-    def update_screen(self):
+    def initialize_board_sprites(self, spriteGroups, spriteClassMap):
         """
-        the method used whenever to update the screen that holds the game_board
+        This function will initialize the spriteGroups with sprites defined in the brd file.
+        It won't create a sprite if the line in the cfg file says no_sprite_class.
+        The sprite class name is retrieved from the 4th index.
+        Its x and y coordinate are retrived from the location in the corresponding character in the brd file.
+        :param spriteGroups: List of sprite.Group()'s to add the gameboard sprites to, the sprite.group() to choose is
+                             determined by the index given in the cfg file.
+        :param spriteClassMap: Map of string sprite class names to the actual class's object - used to call the
+                               constructors of the sprites dynamically based on the sprite class string in the cfg file
+        :return: void
+        """
+        for i, box in enumerate(self.board_state):
+            (x, y) = self.get_pixel_coord_from_pos(i)
+
+            if self.box_drawing_map[box][0] != "color" and self.box_drawing_map[box][4] != 'no_sprite_class':
+                # If this element has a sprite class associated with it, we need to create a sprite object for it
+                # and add it to the correct spriteGroup.
+                # The sprite groups are passed in as a list and their index is in the .cfg file.
+                # The spriteClassMap contains mapping between sprite objects and their string name.
+                # This is needed so we can instantiate these sprite objects calling their constructor.
+                spriteName = self.box_drawing_map[box][4]
+                spriteToAdd = spriteClassMap[spriteName](self.box_drawing_map[box][2], x, y)
+                spriteGroups[int(self.box_drawing_map[box][5])].add(spriteToAdd)
+
+    def update_non_board_sprites(self):
+        """
+        The method used whenever to update the screen that holds the game_boardgame board images to the screen
+        It will either update the background, or draw unchanging game board images to the screen.
         :return: void
         """
         for i, box in enumerate(self.board_state):
@@ -57,7 +82,9 @@ class GUIGameBoard(game_board.GameBoard):
                                   self.box_width,
                                   self.box_width])
             else:
-                self.screen.blit(self.box_drawing_map[box][2], (x, y))
+                # Drawing non Sprite board image to the screen
+                if self.box_drawing_map[box][4] == 'no_sprite_class':
+                    self.screen.blit(self.box_drawing_map[box][2], (x, y))
 
     def get_pixel_coord_from_pos(self, pos):
         """
@@ -71,8 +98,14 @@ class GUIGameBoard(game_board.GameBoard):
             return [-1, -1]
         return [x * self.box_width, y * self.box_width]
 
-    def initialize_images(self):
+    def initialize(self):
+        """
+        Initializes the images for each of the board elements.
+        :return: void
+        """
+        print(self.box_drawing_map.items())
         for entry in self.box_drawing_map.items():
             if entry[1][0] == "img":
                 img_path = entry[1][1]
+                # loading the actual image for this game board element
                 entry[1][2] = pygame.image.load(img_path).convert()

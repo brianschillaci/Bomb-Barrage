@@ -136,26 +136,24 @@ class SuperExplosion:
 
 
 class UnbreakableRock(pygame.sprite.Sprite):
-    """
-    Not started yet.
-    """
-
-    def __init__(self):
+    def __init__(self, image, x, y):
         # Calling super constructor for the Sprite class, since we are extending the Sprite class
         pygame.sprite.Sprite.__init__(self)
+        self.image = image
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
 
 
 class BreakableRock(pygame.sprite.Sprite):
-    """
-    Not started yet.
-    """
 
-    def __init__(self):
-        """
-
-        """
+    def __init__(self, image, x, y):
         # Calling super constructor for the Sprite class, since we are extending the Sprite class
         pygame.sprite.Sprite.__init__(self)
+        self.image = image
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
 
 
 class Bomb(pygame.sprite.Sprite):
@@ -227,8 +225,6 @@ class Wall(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
-
-
 
 
 class Player(pygame.sprite.Sprite):
@@ -325,8 +321,7 @@ class Player(pygame.sprite.Sprite):
 
     # End of load_images() function
 
-
-    def animate_player(self):
+    def animate_player(self, distance):
         """
         This function will animate the movement/non-movement of a player object.
         :return: No return.
@@ -345,19 +340,19 @@ class Player(pygame.sprite.Sprite):
                     # Update the image to the current frame of the animation.
                     self.image = self.walk_frames_r[self.current_frame]
                     # Move the underlying rectangle of which the image of the player will be drawn onto.
-                    self.rect.x += 10
+                    self.rect.x += distance
                 elif self.walkingLeft:
                     self.current_frame = (self.current_frame + 1) % len(self.walk_frames_l)
                     self.image = self.walk_frames_l[self.current_frame]
-                    self.rect.x -= 10
+                    self.rect.x -= distance
                 elif self.walkingForward:
                     self.current_frame = (self.current_frame + 1) % len(self.walk_frames_forward)
                     self.image = self.walk_frames_forward[self.current_frame]
-                    self.rect.y -= 10
+                    self.rect.y -= distance
                 elif self.walkingBackward:
                     self.current_frame = (self.current_frame + 1) % len(self.walk_frames_back)
                     self.image = self.walk_frames_back[self.current_frame]
-                    self.rect.y += 10
+                    self.rect.y += distance
             self.walking = False
         # Display the frame for if the player is standing still
         elif not self.walking:
@@ -372,52 +367,45 @@ class Player(pygame.sprite.Sprite):
                 self.current_frame = 0
             self.image = self.standing_frames[self.current_frame]
 
-    def walk_right(self,walk):
+    def walk_right(self, walk):
         self.reset_walking_booleans()
 
+        self.walking = True
+        self.walkingRight = True
         if walk:
-            self.walking = True
-            self.walkingRight = True
+            self.animate_player(8)
         else:
-            self.walking = False
-            self.walkingRight = False
-
-        self.animate_player()
+            self.animate_player(0)
 
     def walk_forward(self, walk):
         self.reset_walking_booleans()
 
+        self.walking = True
+        self.walkingForward = True
         if walk:
-            self.walking = True
-            self.walkingForward = True
+            self.animate_player(8)
         else:
-            self.walking = False
-            self.walkingForward = False
-
-        self.animate_player()
+            self.animate_player(0)
 
     def walk_left(self, walk):
         self.reset_walking_booleans()
 
+        self.walking = True
+        self.walkingLeft = True
         if walk:
-            self.walking = True
-            self.walkingLeft = True
+            self.animate_player(8)
         else:
-            self.walking = False
-            self.walkingLeft = False
-        self.animate_player()
+            self.animate_player(0)
 
     def walk_backward(self, walk):
         self.reset_walking_booleans()
 
+        self.walking = True
+        self.walkingBackward = True
         if walk:
-            self.walking = True
-            self.walkingBackward = True
+            self.animate_player(8)
         else:
-            self.walking = False
-            self.walkingBackward = False
-
-        self.animate_player()
+            self.animate_player(0)
 
     def reset_walking_booleans(self):
         self.walking = False
