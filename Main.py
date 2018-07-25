@@ -1,6 +1,6 @@
 from os import path
 
-from CollisionUtil import player_movement_collision_allowed
+from CollisionUtil import player_collision_allowed_rocks
 from gui_game_board import GUIGameBoard as GBoard
 import pygame
 from Settings import WIDTH, HEIGHT, TITLE, RESOURCE_FOLDER, SPRITESHEET, BOMBSPRITESHEET, \
@@ -171,41 +171,41 @@ while carryOn:
     # The user can use WASD or the arrow keys in order to move their character
     if keys[pygame.K_LEFT] or keys[pygame.K_a]:
         if collission_2 is not None:
-            player1.walk_left(False)
+            player1.walk_left()
         else:
             player1.rect.x -= MOVEMENT_DISTANCE
-            ableToWalk = player_movement_collision_allowed(player1, unbreakableRocks, 'left')
-            ableToWalk = player_movement_collision_allowed(player1, breakableRocks, 'left')
+            ableToWalk = player_collision_allowed_rocks(player1, unbreakableRocks, 'left')
+            ableToWalk = player_collision_allowed_rocks(player1, breakableRocks, 'left')
             player1.walk_left()
         if keys[pygame.K_SPACE]:
             drop_bomb(player1, bombspritesheet, otherSprites, bomb_set)
     elif keys[pygame.K_RIGHT] or keys[pygame.K_d]:
         if collission_4 is not None:
-            player1.walk_right(False)
+            player1.walk_right()
         else:
             player1.rect.x += MOVEMENT_DISTANCE
-            ableToWalk = player_movement_collision_allowed(player1, unbreakableRocks, 'right')
-            ableToWalk = player_movement_collision_allowed(player1, breakableRocks, 'right')
+            ableToWalk = player_collision_allowed_rocks(player1, unbreakableRocks, 'right')
+            ableToWalk = player_collision_allowed_rocks(player1, breakableRocks, 'right')
             player1.walk_right()
         if keys[pygame.K_SPACE]:
             drop_bomb(player1, bombspritesheet, otherSprites, bomb_set)
     elif keys[pygame.K_UP] or keys[pygame.K_w]:
         if collission_1 is not None:
-            player1.walk_forward(False)
+            player1.walk_forward()
         else:
             player1.rect.y -= MOVEMENT_DISTANCE
-            ableToWalk = player_movement_collision_allowed(player1, unbreakableRocks, 'up')
-            ableToWalk = player_movement_collision_allowed(player1, breakableRocks, 'up')
+            ableToWalk = player_collision_allowed_rocks(player1, unbreakableRocks, 'up')
+            ableToWalk = player_collision_allowed_rocks(player1, breakableRocks, 'up')
             player1.walk_forward()
         if keys[pygame.K_SPACE]:
             drop_bomb(player1, bombspritesheet, otherSprites, bomb_set)
     elif keys[pygame.K_DOWN] or keys[pygame.K_s]:
         if collission_3 is not None:
-            player1.walk_backward(False)
+            player1.walk_backward()
         else:
             player1.rect.y += MOVEMENT_DISTANCE
-            ableToWalk = player_movement_collision_allowed(player1, unbreakableRocks, 'down')
-            ableToWalk = player_movement_collision_allowed(player1, breakableRocks, 'down')
+            ableToWalk = player_collision_allowed_rocks(player1, unbreakableRocks, 'down')
+            ableToWalk = player_collision_allowed_rocks(player1, breakableRocks, 'down')
             player1.walk_backward()
         if keys[pygame.K_SPACE]:
             drop_bomb(player1, bombspritesheet, otherSprites, bomb_set)

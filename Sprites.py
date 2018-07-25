@@ -278,8 +278,6 @@ class Player(pygame.sprite.Sprite):
 
         self.rect.y = startY
 
-    # End of constructor for Player object
-
     def load_player_images(self):
         """
         This function will initialize all of the animation arrays for a player object.
