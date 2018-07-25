@@ -11,6 +11,8 @@ DEFAULT_THEME = "themes/default.cfg"
 # The lower the number, the faster the animation
 ANIMATION_SPEED = 90
 
+MOVEMENT_DISTANCE = 8
+
 
 # define colors
 WHITE = (255, 255, 255)
