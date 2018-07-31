@@ -4,7 +4,7 @@ from CollisionUtil import player_collision_allowed_rocks
 from gui_game_board import GUIGameBoard as GBoard
 import pygame
 from Settings import WIDTH, HEIGHT, TITLE, RESOURCE_FOLDER, SPRITESHEET, BOMBSPRITESHEET, \
-    GAME_BOARD, DEFAULT_THEME, BLACK, MOVEMENT_DISTANCE
+    LEVEL_0_BRD, LEVEL_1_BRD, LEVEL_2_BRD, LEVEL_0_THEME, LEVEL_1_THEME, LEVEL_2_THEME, BLACK, MOVEMENT_DISTANCE
 from Sprites import Player, Spritesheet, SuperExplosion, Wall, BreakableRock, UnbreakableRock
 
 # Initialization function needed by Pygame
@@ -28,17 +28,21 @@ breakableRocks = pygame.sprite.Group()
 # List of sprite groups to be passed to initialization function of the game board.
 # These sprite groups will we the sprite groups that the individual game board sprites will be added to.
 # The index in the theme configuration determines which sprite group in this list that the sprite gets added to.
-gameBoardSpriteGroups = list((unbreakableRocks, breakableRocks))
+gameBoardSpriteGroups = list((breakableRocks, unbreakableRocks))
 
 # This is a map between the string names of the classes and the actual class.
 # It is used to create sprite objects in the game board.
-boardSpriteClassMap = {'BreakableRock': BreakableRock, 'UnbreakableRock': UnbreakableRock}
+level2BoardSpriteClassMap = {'BreakableRock': BreakableRock, 'UnbreakableRock': UnbreakableRock}
 
 # Initialize the gui_game_board for drawing the static background on screen.
-gboard = GBoard(screen, DEFAULT_THEME, GAME_BOARD)
+level0 = GBoard(screen, LEVEL_0_THEME, LEVEL_0_BRD)
+
+level1 = GBoard(screen, LEVEL_1_THEME, LEVEL_1_BRD)
+
+level2 = GBoard(screen, LEVEL_2_THEME, LEVEL_2_BRD)
 
 # Adds all the sprites in the game board to the corresponding gameBoardSpriteGroups
-gboard.initialize_board_sprites(gameBoardSpriteGroups, boardSpriteClassMap)
+level2.initialize_board_sprites(gameBoardSpriteGroups, level2BoardSpriteClassMap)
 
 # Boolean value that keeps the game running until someone wins or the game is closed
 carryOn = True
@@ -49,8 +53,9 @@ clock = pygame.time.Clock()
 # Set of all active sprites, that will be drawn each frame
 playerSprites = pygame.sprite.Group()
 
-# Set of all other sprites, like bombs, explosions, items
-otherSprites = pygame.sprite.Group()
+explosions = pygame.sprite.Group()
+
+bombs = pygame.sprite.Group()
 
 # Creation of the players in the game
 player1 = Player(33,50)
@@ -105,7 +110,11 @@ while carryOn:
             if event.key == pygame.K_x:
                 carryOn = False
 
-    gboard.update_non_board_sprites()
+    level0.update_non_board_sprites()
+
+    level1.update_non_board_sprites()
+
+    level2.update_non_board_sprites()
 
     # check for collisions in all the four corners of the screen
     collission_1 = pygame.sprite.spritecollideany(wall_1, playerSprites)
@@ -114,6 +123,8 @@ while carryOn:
     collission_4 = pygame.sprite.spritecollideany(wall_4, playerSprites)
 
     # TODO - collisions with rocks and explosions
+    breakableRocksAndExplosions = pygame.sprite.groupcollide(breakableRocks, explosions, True, False)
+
     # TODO - collisions with explosions and players
     # TODO - collisions with players and other players
 
@@ -125,7 +136,8 @@ while carryOn:
     # Draw all of the sprites on the screen.
     breakableRocks.draw(screen)
     unbreakableRocks.draw(screen)
-    otherSprites.draw(screen)
+    bombs.draw(screen)
+    explosions.draw(screen)
     playerSprites.draw(screen)
     walls.draw(screen)
 
@@ -141,7 +153,7 @@ while carryOn:
     # Remove all the bombs that exploded from the list of all the sprites that are drawn each frame
     # Also create the explosion animation for that bomb
     for bomb in bombs_to_remove:
-        otherSprites.remove(bomb)
+        bombs.remove(bomb)
 
         # Now that this bomb is removed, we need to animate the explosion to take it's place
         explosion = SuperExplosion(player1, time, bomb.rect.x, bomb.rect.y, bombspritesheet)
@@ -154,13 +166,13 @@ while carryOn:
         # If the explosion isn't done, load the next set of sprites for it
         if explosionDoneBool:
             for sub_explosion in explosion.explosionList:
-                if not otherSprites.has(sub_explosion):
-                    otherSprites.add(sub_explosion)
+                if not explosions.has(sub_explosion):
+                    explosions.add(sub_explosion)
         # The explosion is done, add to the explosion remove list
         else:
             explosions_to_remove.add(explosion)
             for subExplosion in explosion.toRemoveAtEnd:
-                otherSprites.remove(subExplosion)
+                explosions.remove(subExplosion)
 
     if explosions_to_remove:
         explosion_set -= explosions_to_remove
@@ -178,7 +190,7 @@ while carryOn:
             ableToWalk = player_collision_allowed_rocks(player1, breakableRocks, 'left')
             player1.walk_left()
         if keys[pygame.K_SPACE]:
-            drop_bomb(player1, bombspritesheet, otherSprites, bomb_set)
+            drop_bomb(player1, bombspritesheet, bombs, bomb_set)
     elif keys[pygame.K_RIGHT] or keys[pygame.K_d]:
         if collission_4 is not None:
             player1.walk_right()
@@ -188,7 +200,7 @@ while carryOn:
             ableToWalk = player_collision_allowed_rocks(player1, breakableRocks, 'right')
             player1.walk_right()
         if keys[pygame.K_SPACE]:
-            drop_bomb(player1, bombspritesheet, otherSprites, bomb_set)
+            drop_bomb(player1, bombspritesheet, bombs, bomb_set)
     elif keys[pygame.K_UP] or keys[pygame.K_w]:
         if collission_1 is not None:
             player1.walk_forward()
@@ -198,19 +210,19 @@ while carryOn:
             ableToWalk = player_collision_allowed_rocks(player1, breakableRocks, 'up')
             player1.walk_forward()
         if keys[pygame.K_SPACE]:
-            drop_bomb(player1, bombspritesheet, otherSprites, bomb_set)
+            drop_bomb(player1, bombspritesheet, bombs, bomb_set)
     elif keys[pygame.K_DOWN] or keys[pygame.K_s]:
         if collission_3 is not None:
             player1.walk_backward()
-        else:
+        else: 
             player1.rect.y += MOVEMENT_DISTANCE
             ableToWalk = player_collision_allowed_rocks(player1, unbreakableRocks, 'down')
             ableToWalk = player_collision_allowed_rocks(player1, breakableRocks, 'down')
             player1.walk_backward()
         if keys[pygame.K_SPACE]:
-            drop_bomb(player1, bombspritesheet, otherSprites, bomb_set)
+            drop_bomb(player1, bombspritesheet, bombs, bomb_set)
     elif keys[pygame.K_SPACE]:
-        drop_bomb(player1, bombspritesheet, otherSprites, bomb_set)
+        drop_bomb(player1, bombspritesheet, bombs, bomb_set)
     else:
         player1.walking = False
         player1.placingBomb = False
@@ -219,7 +231,8 @@ while carryOn:
     # These 4 statements will redraw the game, both the background and the sprites on top of the background
     unbreakableRocks.update()
     breakableRocks.update()
-    otherSprites.update()
+    bombs.update()
+    explosions.update()
     playerSprites.update()
     pygame.display.flip()
     screen.fill(BLACK)

@@ -55,6 +55,10 @@ class GUIGameBoard(game_board.GameBoard):
         for i, box in enumerate(self.board_state):
             (x, y) = self.get_pixel_coord_from_pos(i)
 
+            # '~' means there is no image to be drawn for that location
+            if box is '~':
+                continue
+
             if self.box_drawing_map[box][0] != "color" and self.box_drawing_map[box][4] != 'no_sprite_class':
                 # If this element has a sprite class associated with it, we need to create a sprite object for it
                 # and add it to the correct spriteGroup.
@@ -73,6 +77,10 @@ class GUIGameBoard(game_board.GameBoard):
         """
         for i, box in enumerate(self.board_state):
             (x, y) = self.get_pixel_coord_from_pos(i)
+
+            # '~' means there is no image to be drawn for that location
+            if box is '~':
+                continue
 
             if self.box_drawing_map[box][0] == "color":
                 pygame.draw.rect(self.screen,
