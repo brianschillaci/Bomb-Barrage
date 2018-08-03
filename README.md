@@ -1,2 +1,2 @@
 # Bomberman
-Bomberman game done with Python and Pygame
+Bomberman game done with Python and Pygame.
