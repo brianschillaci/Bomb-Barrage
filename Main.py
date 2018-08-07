@@ -122,13 +122,7 @@ while carryOn:
     collission_3 = pygame.sprite.spritecollideany(wall_3, playerSprites)
     collission_4 = pygame.sprite.spritecollideany(wall_4, playerSprites)
 
-    # TODO - collisions with rocks and explosions
     breakableRocksAndExplosions = pygame.sprite.groupcollide(breakableRocks, explosions, True, False)
-
-    # TODO - collisions with explosions and players
-    # TODO - collisions with players and other players
-
-    # TODO - when there is a collision with a breakable rock and it disappears, there needs to be a floor tile that is drawn in its place
 
     # Get the key that was pressed by the user.
     keys = pygame.key.get_pressed()
