@@ -5,12 +5,14 @@ FPS = 60
 RESOURCE_FOLDER = "res"
 SPRITESHEET = "bombermansprites.png"
 BOMBSPRITESHEET = "bombs.png"
-LEVEL_0_BRD = "boards/level0.brd"
-LEVEL_1_BRD = "boards/level1.brd"
-LEVEL_2_BRD = "boards/level2.brd"
-LEVEL_0_THEME = "themes/level0.cfg"
-LEVEL_1_THEME = "themes/level1.cfg"
-LEVEL_2_THEME = "themes/level2.cfg"
+LEVEL_0_BRD = "config.board/level0.brd"
+LEVEL_1_BRD = "config.board/level1.brd"
+LEVEL_2_BRD = "config.board/level2.brd"
+LEVEL_0_THEME = "config.board/level0.cfg"
+LEVEL_1_THEME = "config.board/level1.cfg"
+LEVEL_2_THEME = "config.board/level2.cfg"
+
+BOMB_DETONATION_TIME = 400
 
 # The lower the number, the faster the animation
 ANIMATION_SPEED = 90

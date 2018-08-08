@@ -1,15 +1,16 @@
-from os import path
-
-from CollisionUtil import player_collision_allowed_rocks
-from gui_game_board import GUIGameBoard as GBoard
 import pygame
+from os import path
+from gui_game_board import GUIGameBoard as GBoard
 from Settings import WIDTH, HEIGHT, TITLE, RESOURCE_FOLDER, SPRITESHEET, BOMBSPRITESHEET, \
     LEVEL_0_BRD, LEVEL_1_BRD, LEVEL_2_BRD, LEVEL_0_THEME, LEVEL_1_THEME, LEVEL_2_THEME, BLACK, MOVEMENT_DISTANCE
-from Sprites import Player, Spritesheet, SuperExplosion, Wall, BreakableRock, UnbreakableRock
+from sprites.Bombs import drop_bomb
+from sprites.MapElements import Wall, UnbreakableRock, BreakableRock
+from sprites.Players import Player
+from sprites.Explosions import SuperExplosion
+from util import CollisionUtil
+from sprites import Spritesheet
 
 # Initialization function needed by Pygame
-from Utilities import drop_bomb
-
 pygame.init()
 
 # Size of the screen/window for the game
@@ -58,7 +59,7 @@ explosions = pygame.sprite.Group()
 bombs = pygame.sprite.Group()
 
 # Creation of the players in the game
-player1 = Player(33,50)
+player1 = Player(33, 50)
 
 # Adding player1 to the active list of all sprites
 playerSprites.add(player1)
@@ -87,18 +88,8 @@ explosions_to_remove = set()
 
 x = path.dirname(__file__)
 img_dir = path.join(x, RESOURCE_FOLDER)
-spritesheet = Spritesheet(path.join(img_dir, SPRITESHEET))
-bombspritesheet = Spritesheet(path.join(img_dir, BOMBSPRITESHEET))
-
-
-def walking_collision_check(collisionList):
-    for collision in collisionList:
-        if collision is not None:
-            return True
-        else:
-            continue
-    return False
-
+spritesheet = Spritesheet.Spritesheet(path.join(img_dir, SPRITESHEET))
+bombspritesheet = Spritesheet.Spritesheet(path.join(img_dir, BOMBSPRITESHEET))
 
 while carryOn:
     time = clock.tick(60)
@@ -137,7 +128,8 @@ while carryOn:
 
     # Check if any bombs on the screen have expired and are ready to explode.
     for bomb in bomb_set:
-        if bomb.animate(time):
+        bombReadyToExplode = bomb.animate(time, bombspritesheet)
+        if bombReadyToExplode:
             bombs_to_remove.add(bomb)
 
     # if bombs to remove isn't empty, remove them from the bomb_set, which is the set of all active bombs
@@ -180,8 +172,7 @@ while carryOn:
             player1.walk_left()
         else:
             player1.rect.x -= MOVEMENT_DISTANCE
-            ableToWalk = player_collision_allowed_rocks(player1, unbreakableRocks, 'left')
-            ableToWalk = player_collision_allowed_rocks(player1, breakableRocks, 'left')
+            CollisionUtil.fix_player_collisions(player1, gameBoardSpriteGroups, 'left')
             player1.walk_left()
         if keys[pygame.K_SPACE]:
             drop_bomb(player1, bombspritesheet, bombs, bomb_set)
@@ -190,8 +181,7 @@ while carryOn:
             player1.walk_right()
         else:
             player1.rect.x += MOVEMENT_DISTANCE
-            ableToWalk = player_collision_allowed_rocks(player1, unbreakableRocks, 'right')
-            ableToWalk = player_collision_allowed_rocks(player1, breakableRocks, 'right')
+            CollisionUtil.fix_player_collisions(player1, gameBoardSpriteGroups, 'right')
             player1.walk_right()
         if keys[pygame.K_SPACE]:
             drop_bomb(player1, bombspritesheet, bombs, bomb_set)
@@ -200,8 +190,7 @@ while carryOn:
             player1.walk_forward()
         else:
             player1.rect.y -= MOVEMENT_DISTANCE
-            ableToWalk = player_collision_allowed_rocks(player1, unbreakableRocks, 'up')
-            ableToWalk = player_collision_allowed_rocks(player1, breakableRocks, 'up')
+            CollisionUtil.fix_player_collisions(player1, gameBoardSpriteGroups, 'up')
             player1.walk_forward()
         if keys[pygame.K_SPACE]:
             drop_bomb(player1, bombspritesheet, bombs, bomb_set)
@@ -210,8 +199,7 @@ while carryOn:
             player1.walk_backward()
         else: 
             player1.rect.y += MOVEMENT_DISTANCE
-            ableToWalk = player_collision_allowed_rocks(player1, unbreakableRocks, 'down')
-            ableToWalk = player_collision_allowed_rocks(player1, breakableRocks, 'down')
+            CollisionUtil.fix_player_collisions(player1, gameBoardSpriteGroups, 'down')
             player1.walk_backward()
         if keys[pygame.K_SPACE]:
             drop_bomb(player1, bombspritesheet, bombs, bomb_set)

@@ -1,9 +1,16 @@
 import pygame
 
-from Sprites import Player
+from sprites.Players import Player
+from sprites.MapElements import BreakableRock, UnbreakableRock
 
 
-def player_collision_allowed_rocks(spriteObject, rocks, movementDirection):
+def fix_player_collisions(player, collisionList, movementDirection):
+    for collision in collisionList:
+        if collision is type(BreakableRock) or type(UnbreakableRock):
+            fix_player_rock_collision(player, collision, movementDirection)
+
+
+def fix_player_rock_collision(spriteObject, rocks, movementDirection):
     # Creating a temporary copy of the player sprite
     spriteObjectTemp = Player(spriteObject.rect.x, spriteObject.rect.y)
     spriteObjectTemp.rect = pygame.rect.Rect((0, 0), (9, 15))
@@ -31,7 +38,3 @@ def player_collision_allowed_rocks(spriteObject, rocks, movementDirection):
                 spriteObject.rect.top = collisionObject.rect.top + 5
             else:
                 spriteObject.rect.bottom = collisionObject.rect.top
-        return False
-    else:
-        return True
-
