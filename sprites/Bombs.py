@@ -91,5 +91,5 @@ def drop_bomb(player, bombspritesheet, otherSprites, bomb_set):
         otherSprites.add(bomb)
         bomb_set.add(bomb)
         # Update the location of the bomb to the (x,y) of where the player dropped it
-        bomb.rect.x = player.rect.x
-        bomb.rect.y = player.rect.y + 20
+        bomb.rect.x = (player.rect.centerx // 32) * 32
+        bomb.rect.y = ((player.rect.bottom - 5) // 32) * 32

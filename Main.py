@@ -148,9 +148,9 @@ while carryOn:
     bombs_to_remove.clear()
     # Check if any explosions need to update their animation and also if they are done
     for explosion in explosion_set:
-        explosionDoneBool = explosion.update_explosion_list(time)
+        explosionIsNotDone = explosion.update_explosion_list(time, unbreakableRocks)
         # If the explosion isn't done, load the next set of sprites for it
-        if explosionDoneBool:
+        if explosionIsNotDone:
             for sub_explosion in explosion.explosionList:
                 if not explosions.has(sub_explosion):
                     explosions.add(sub_explosion)
