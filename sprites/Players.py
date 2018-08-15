@@ -2,6 +2,7 @@ from os import path
 from typing import List
 import pygame
 from Settings import SPRITESHEET, RESOURCE_FOLDER, ANIMATION_SPEED, WHITE
+from sprites.Hitboxes import PlayerHitbox
 from sprites.Spritesheet import Spritesheet
 
 
@@ -19,6 +20,10 @@ class Player(pygame.sprite.Sprite):
         """
         # Calling super constructor for the Sprite class, since we are extending the Sprite class
         pygame.sprite.Sprite.__init__(self)
+
+        self.lives = 1
+
+        self.isInExplosionAnimation = False
 
         # Boolean values for current states of action for this player
         self.walking = False
@@ -53,10 +58,10 @@ class Player(pygame.sprite.Sprite):
         # Setting the rect object for this player object - every sprite has a hidden rectangle behind its image
         # This rectangle allows for collision detection, movement, and more
         self.rect = self.image.get_rect()
-
         self.rect.x = startX
-
         self.rect.y = startY
+
+        self.hitbox = PlayerHitbox(self, self.rect.width / 2, self.rect.height / 5)
 
     def load_player_images(self):
         """
@@ -181,3 +186,9 @@ class Player(pygame.sprite.Sprite):
         self.reset_walking_booleans()
         self.placingBomb = True
         return True
+
+    def is_alive(self):
+        return self.lives > 0
+
+    def is_dead(self):
+        return self.lives <= 0

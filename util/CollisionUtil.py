@@ -1,6 +1,5 @@
 import pygame
 
-from sprites.Players import Player
 from sprites.MapElements import BreakableRock, UnbreakableRock
 
 
@@ -10,18 +9,10 @@ def fix_player_collisions(player, collisionList, movementDirection):
             fix_player_rock_collision(player, collision, movementDirection)
 
 
-def fix_player_rock_collision(spriteObject, rocks, movementDirection):
-    # Creating a temporary copy of the player sprite
-    spriteObjectTemp = Player(spriteObject.rect.x, spriteObject.rect.y)
-    spriteObjectTemp.rect = pygame.rect.Rect((0, 0), (9, 15))
-    if movementDirection is "left":
-        spriteObjectTemp.rect.bottomleft = spriteObject.rect.bottomleft
-    elif movementDirection is "right":
-        spriteObjectTemp.rect.bottomright = spriteObject.rect.bottomright
-    else:
-        spriteObjectTemp.rect.midbottom = spriteObject.rect.midbottom
+def fix_player_rock_collision(player, rocks, movementDirection):
+    player.hitbox.update_rect(player, player.rect.width - 5, player.rect.height / 4)
 
-    rockCollisions = pygame.sprite.spritecollide(spriteObjectTemp, rocks, False)
+    rockCollisions = pygame.sprite.spritecollide(player.hitbox, rocks, False)
 
     # If the player is colliding with other objects
     if rockCollisions:
@@ -29,12 +20,31 @@ def fix_player_rock_collision(spriteObject, rocks, movementDirection):
         # position depending on the movement direction
         for collisionObject in rockCollisions:
             if movementDirection is "left":
-                spriteObject.rect.left = collisionObject.rect.right
+                player.rect.left = collisionObject.rect.right
             elif movementDirection is "right":
-                spriteObject.rect.right = collisionObject.rect.left
+                player.rect.right = collisionObject.rect.left
             elif movementDirection is "up":
                 # When a player is walking up, they don't get stopped at their head,
                 # they get stopped at a smaller hit box near their feet
-                spriteObject.rect.top = collisionObject.rect.top + 5
+                player.rect.top = collisionObject.rect.top
             else:
-                spriteObject.rect.bottom = collisionObject.rect.top
+                player.rect.bottom = collisionObject.rect.top
+
+
+def update_player_lives(players, time):
+    for player in players:
+        if player.isInExplosionAnimation:
+            if player.hitbox.explosionTime > 0:
+                player.hitbox.explosionTime -= time
+            else:
+                # The animation is done, we can subtract one from the players lives
+                # and reset values for explosion animation timer
+                player.lives -= 1
+                player.isInExplosionAnimation = False
+                player.hitbox.explosionTime = 90
+
+
+def update_player_hitboxes(playerHitboxes):
+    # Add all the update hitboxes
+    for hitbox in playerHitboxes:
+        hitbox.update_rect(hitbox.player, hitbox.player.rect.width, hitbox.player.rect.height / 4)

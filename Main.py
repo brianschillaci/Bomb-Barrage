@@ -9,6 +9,11 @@ from sprites.Players import Player
 from sprites.Explosions import SuperExplosion
 from util import CollisionUtil
 from sprites import Spritesheet
+import os
+
+x = 720
+y = 332
+os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (x, y)
 
 # Initialization function needed by Pygame
 pygame.init()
@@ -51,8 +56,9 @@ carryOn = True
 # Clock for the game, helps with timing of animations like bomb explosion
 clock = pygame.time.Clock()
 
-# Set of all active sprites, that will be drawn each frame
+# Set of all player sprites
 playerSprites = pygame.sprite.Group()
+playerHitboxes = pygame.sprite.Group()
 
 explosions = pygame.sprite.Group()
 
@@ -60,9 +66,10 @@ bombs = pygame.sprite.Group()
 
 # Creation of the players in the game
 player1 = Player(33, 50)
-
-# Adding player1 to the active list of all sprites
+# Adding player1 to the player sprite group as well as
+# its hitbox to the playerhitbox group
 playerSprites.add(player1)
+playerHitboxes.add(player1.hitbox)
 
 # Set of all active bombs
 bomb_set = set()
@@ -107,6 +114,9 @@ while carryOn:
 
     level2.update_non_board_sprites()
 
+    for player in playerSprites:
+        player.hitbox.update_rect(player, player.rect.width - 5, player.rect.height / 4)
+
     # check for collisions in all the four corners of the screen
     collission_1 = pygame.sprite.spritecollideany(wall_1, playerSprites)
     collission_2 = pygame.sprite.spritecollideany(wall_2, playerSprites)
@@ -114,6 +124,25 @@ while carryOn:
     collission_4 = pygame.sprite.spritecollideany(wall_4, playerSprites)
 
     breakableRocksAndExplosions = pygame.sprite.groupcollide(breakableRocks, explosions, True, False)
+
+    CollisionUtil.update_player_hitboxes(playerHitboxes)
+
+    playersAndExplosions = pygame.sprite.groupcollide(playerHitboxes, explosions, False, False)
+
+    for hitbox in playersAndExplosions:
+        hitbox.player.isInExplosionAnimation = True
+
+    CollisionUtil.update_player_lives(playerSprites, time)
+
+    for player in playerSprites:
+        if player.is_dead():
+            # Find this player's hitbox and remove it
+            for hitbox in playerHitboxes:
+                if hitbox.player is player:
+                    playerHitboxes.remove(hitbox)
+                    break
+            # Remove this player from the game
+            playerSprites.remove(player)
 
     # Get the key that was pressed by the user.
     keys = pygame.key.get_pressed()
@@ -197,7 +226,7 @@ while carryOn:
     elif keys[pygame.K_DOWN] or keys[pygame.K_s]:
         if collission_3 is not None:
             player1.walk_backward()
-        else: 
+        else:
             player1.rect.y += MOVEMENT_DISTANCE
             CollisionUtil.fix_player_collisions(player1, gameBoardSpriteGroups, 'down')
             player1.walk_backward()
@@ -211,11 +240,6 @@ while carryOn:
         player1.animate_player()
 
     # These 4 statements will redraw the game, both the background and the sprites on top of the background
-    unbreakableRocks.update()
-    breakableRocks.update()
-    bombs.update()
-    explosions.update()
-    playerSprites.update()
     pygame.display.flip()
     screen.fill(BLACK)
     clock.tick(60)
