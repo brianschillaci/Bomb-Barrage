@@ -1,25 +1,51 @@
 import pygame
 from Settings import WHITE
 
+
 class ExplosionImage:
     def __init__(self, sprite_x, sprite_y, rotate, spriteSheet):
         self.sprite_x = sprite_x
         self.sprite_y = sprite_y
         self.rotate = rotate
+        self.image = pygame.transform.scale(spriteSheet.get_image(self.sprite_x, self.sprite_y, 16, 16), (32, 32))
+        if rotate:
+            self.image = pygame.transform.rotate(self.image, 180)
 
 
-center = ExplosionImage(85, 17, False)
-vertical_pipe = ExplosionImage(51, 17, False)
-horizontal_pipe = ExplosionImage(68, 17, False)
-end_up = ExplosionImage(0, 17, True)
-end_left = ExplosionImage(34, 17, True)
-end_down = ExplosionImage(0, 17, False)
-end_right = ExplosionImage(34, 17, False)
+images_initialized = False
+
+center = None
+vertical_pipe = None
+horizontal_pipe = None
+end_up = None
+end_left = None
+end_down = None
+end_right = None
+
+
+def init_images(sprite_sheet):
+    """
+    Initialize all of the ExplosionImages that are to be used in drawing
+    explosion animations on the screen.
+    :param sprite_sheet: The sprite sheet which contains the explosion components.
+    :return: None, updates global ExplosionImage variables.
+    """
+    global center, vertical_pipe, horizontal_pipe, end_up, \
+           end_left, end_down, end_right, images_initialized
+    center = ExplosionImage(85, 17, False, sprite_sheet)
+    vertical_pipe = ExplosionImage(51, 17, False, sprite_sheet)
+    horizontal_pipe = ExplosionImage(68, 17, False, sprite_sheet)
+    end_up = ExplosionImage(0, 17, True, sprite_sheet)
+    end_left = ExplosionImage(34, 17, True, sprite_sheet)
+    end_down = ExplosionImage(0, 17, False, sprite_sheet)
+    end_right = ExplosionImage(34, 17, False, sprite_sheet)
+
+    images_initialized = True
 
 
 class Explosion(pygame.sprite.Sprite):
-    def __init__(self, player, x, y, width, height, bombRectX, bombRectY, xAmountToAdd, yAmountToAdd, spriteSheet,
-                 rotateBool):
+    def __init__(self, player, x, y, width, height, bombRectX, bombRectY, xAmountToAdd, yAmountToAdd, explosion_image):
+
         # Calling super constructor for the Sprite class, since we are extending the Sprite class
         pygame.sprite.Sprite.__init__(self)
         self.player = player
@@ -28,7 +54,7 @@ class Explosion(pygame.sprite.Sprite):
         self.width = width
         self.height = height
 
-        self.image = pygame.transform.scale(spriteSheet.get_image(self.x, self.y, self.width, self.height), (32, 32))
+        self.image = explosion_image.image
         self.image.set_colorkey(WHITE)
         self.rect = self.image.get_rect()
         self.rect.x = bombRectX
@@ -36,8 +62,6 @@ class Explosion(pygame.sprite.Sprite):
 
         self.rect.x += xAmountToAdd
         self.rect.y += yAmountToAdd
-        if rotateBool:
-            self.image = pygame.transform.rotate(self.image, 180)
 
 
 class SuperExplosion:
@@ -45,6 +69,9 @@ class SuperExplosion:
     toRemoveAtEnd = list()
 
     def __init__(self, player, time, rectX, rectY, bombspritesheet):
+        global images_initialized
+        if not images_initialized:
+            init_images(bombspritesheet)
         self.time = 400
         self.player = player
         self.originX = rectX
@@ -54,34 +81,28 @@ class SuperExplosion:
 
     def update_explosion_list(self, time, blockers):
         """
-        Explosion sprite numbering:
-        ##7##
-        ##6##
-        12345
-        ##8##
-        ##9##
+        Build an explosion animation in the form of a +. The size of the
+        explosion is determined by self.player.explosion_size.
         :param time: Time that has passed since the explosion started.
         :param blockers: Any sprites that are blocking the explosion.
         :return: True if animation is not done, false if the aanimation is done
         """
+
         self.time -= time
         if self.time >= 380:
-            three = Explosion(self.player, 102, 85, 16, 16, self.originX, self.originY, 0, 0,
-                              self.bombspritesheet, False)
+            three = Explosion(self.player, 102, 85, 16, 16, self.originX, self.originY, 0, 0, center)
             self.explosionList.clear()
             self.explosionList.append(three)
             self.toRemoveAtEnd.append(three)
             return True
         elif self.time >= 360:
-            three = Explosion(self.player, 85, 85, 16, 16, self.originX, self.originY, 0, 0,
-                              self.bombspritesheet, False)
+            three = Explosion(self.player, 85, 85, 16, 16, self.originX, self.originY, 0, 0, center)
             self.explosionList.clear()
             self.explosionList.append(three)
             self.toRemoveAtEnd.append(three)
             return True
         elif self.time >= 340:
-            three = Explosion(self.player, 68, 85, 16, 16, self.originX, self.originY, 0, 0,
-                              self.bombspritesheet, False)
+            three = Explosion(self.player, 68, 85, 16, 16, self.originX, self.originY, 0, 0, center)
             self.explosionList.clear()
             self.explosionList.append(three)
             self.toRemoveAtEnd.append(three)
@@ -90,8 +111,7 @@ class SuperExplosion:
 
             self.explosionList.clear()
             # Center explosion
-            cexp = Explosion(self.player, center.sprite_x, center.sprite_y, 16, 16, self.originX, self.originY, 0, 0,
-                              self.bombspritesheet, center.rotate)
+            cexp = Explosion(self.player, center.sprite_x, center.sprite_y, 16, 16, self.originX, self.originY, 0, 0, center)
             self.explosionList.append(cexp)
             self.toRemoveAtEnd.append(cexp)
 
@@ -108,6 +128,19 @@ class SuperExplosion:
             return False
 
     def build_explosion_path(self, dx, dy, is_horizontal, center_explosion, blockers):
+        """
+        Given a pixel sized dx and dy value from center, build the path of the
+        explosion in the vector direction <dx, dy>. Appends Explosions to
+        self.explosionList dynamically and returns None.
+        :param dx: The change in pixel values along x coordinate from center pos.
+        :param dy: The change in pixel values along y coordinate from center pos.
+        :param is_horizontal: Boolean value is true for horizontal direction,
+                              false if vertical from center.
+        :param center_explosion: The Explosion object representing the center of
+                                 the explosion.
+        :param blockers: Any sprites that are blocking the explosion.
+        :return: None
+        """
         if abs(dx) <= 0 and abs(dy) <= 0:
             return
 
@@ -121,7 +154,7 @@ class SuperExplosion:
 
         while piece_number < self.player.explosion_size:
             temp = Explosion(self.player, direction_piece.sprite_x, direction_piece.sprite_y, 16, 16, self.originX,
-                             self.originY, dx * piece_number, dy * piece_number, self.bombspritesheet, direction_piece.rotate)
+                             self.originY, dx * piece_number, dy * piece_number, direction_piece)
             if not pygame.sprite.spritecollideany(temp, blockers) and self.explosionList.__contains__(last_explosion):
                 self.explosionList.append(temp)
             self.toRemoveAtEnd.append(temp)
@@ -129,15 +162,22 @@ class SuperExplosion:
             last_explosion = temp
             piece_number = piece_number + 1
 
-        end_explosion = self.get_end_explosion_piece(dx, dy)
+        end_explosion = SuperExplosion.get_end_explosion_piece(dx, dy)
         temp = Explosion(self.player, end_explosion.sprite_x, end_explosion.sprite_y, 16, 16, self.originX,
-                         self.originY, dx * piece_number, dy * piece_number, self.bombspritesheet,
-                         end_explosion.rotate)
+                         self.originY, dx * piece_number, dy * piece_number, end_explosion)
         if not pygame.sprite.spritecollideany(temp, blockers) and self.explosionList.__contains__(last_explosion):
             self.explosionList.append(temp)
         self.toRemoveAtEnd.append(temp)
 
-    def get_end_explosion_piece(self, dx, dy):
+    @staticmethod
+    def get_end_explosion_piece(dx, dy):
+        """
+        Determine the end direction for single part of an explosion on one of the
+        four cardinal directions, then return the image for that end piece.
+        :param dx: The relative direction from the center of an explosion on x axis.
+        :param dy: The relative direction from the center of an explosion on y axis.
+        :return: The ExplosionImage for the given edge of the explosion.
+        """
         if dx < 0 and dy == 0:
             return end_left
         elif dx > 0 and dy == 0:

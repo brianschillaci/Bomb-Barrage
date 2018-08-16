@@ -51,7 +51,7 @@ class Player(pygame.sprite.Sprite):
         self.last_update = 0
 
         # Size of bomb to start, bomberman has no powerups initially.
-        self.explosion_size = 20
+        self.explosion_size = 2
 
         # Getting the spritesheet file for this player - res is the folder it is in, SPRITESHEET is the filename
         self.dir = path.dirname(__file__)
