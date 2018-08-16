@@ -27,6 +27,7 @@ class Bomb(pygame.sprite.Sprite):
         it will 'explode'. This explosion means removing this bomb sprite, and replacing it by the proper explosion
         sprites. These explosion sprites will then need to do collision checks with all the other sprites, like
         players and rocks, and do the appropriate function for each case of collision.
+        :param spritesheet: The image that has all the smaller bomb images.
         :param time: Input time to subtract from the time remaining on this bomb object.
         :return: True - if bomb is ready to explode. False - if the bomb isn't ready to explode yet.
         """
@@ -35,55 +36,64 @@ class Bomb(pygame.sprite.Sprite):
         if self.time <= BOMB_DETONATION_TIME - 1110:
             return True
         elif self.time <= BOMB_DETONATION_TIME - 1060:
-            set_bomb_image(self, 32, 0, 16, 16, 32, spritesheet)
+            self.set_bomb_image(32, 0, 16, 16, 32, spritesheet)
             return False
         elif self.time <= BOMB_DETONATION_TIME - 1010:
-            set_bomb_image(self, 16, 0, 16, 16, 32, spritesheet)
+            self.set_bomb_image(16, 0, 16, 16, 32, spritesheet)
             return False
         elif self.time <= BOMB_DETONATION_TIME - 960:
-            set_bomb_image(self, 32, 0, 16, 16, 32, spritesheet)
+            self.set_bomb_image(32, 0, 16, 16, 32, spritesheet)
             return False
         elif self.time <= BOMB_DETONATION_TIME - 910:
-            set_bomb_image(self, 16, 0, 16, 16, 32, spritesheet)
+            self.set_bomb_image(16, 0, 16, 16, 32, spritesheet)
             return False
         elif self.time <= BOMB_DETONATION_TIME - 860:
-            set_bomb_image(self, 32, 0, 16, 16, 32, spritesheet)
+            self.set_bomb_image(32, 0, 16, 16, 32, spritesheet)
             return False
         elif self.time <= BOMB_DETONATION_TIME - 810:
-            set_bomb_image(self, 16, 0, 16, 16, 32, spritesheet)
+            self.set_bomb_image(16, 0, 16, 16, 32, spritesheet)
             return False
         elif self.time <= BOMB_DETONATION_TIME - 760:
-            set_bomb_image(self, 32, 0, 16, 16, 32, spritesheet)
+            self.set_bomb_image(32, 0, 16, 16, 32, spritesheet)
             return False
         elif self.time <= BOMB_DETONATION_TIME - 700:
-            set_bomb_image(self, 16, 0, 16, 16, 32, spritesheet)
+            self.set_bomb_image(16, 0, 16, 16, 32, spritesheet)
             return False
         elif self.time <= BOMB_DETONATION_TIME - 600:
-            set_bomb_image(self, 32, 0, 16, 16, 32, spritesheet)
+            self.set_bomb_image(32, 0, 16, 16, 32, spritesheet)
             return False
         elif self.time <= BOMB_DETONATION_TIME - 500:
-            set_bomb_image(self, 0, 0, 16, 16, 32, spritesheet)
+            self.set_bomb_image(0, 0, 16, 16, 32, spritesheet)
             return False
         elif self.time <= BOMB_DETONATION_TIME - 400:
-            set_bomb_image(self, 16, 0, 16, 16, 32, spritesheet)
+            self.set_bomb_image(16, 0, 16, 16, 32, spritesheet)
             return False
         elif self.time <= BOMB_DETONATION_TIME - 300:
-            set_bomb_image(self, 0, 0, 16, 16, 32, spritesheet)
+            self.set_bomb_image(0, 0, 16, 16, 32, spritesheet)
             return False
         elif self.time <= BOMB_DETONATION_TIME - 200:
-            set_bomb_image(self, 16, 0, 16, 16, 32, spritesheet)
+            self.set_bomb_image(16, 0, 16, 16, 32, spritesheet)
             return False
 
-
-def set_bomb_image(self, x, y, l, w, scaleAmount, spritesheet):
-    self.image = pygame.transform.scale(spritesheet.get_image(x, y, l, w), (scaleAmount, scaleAmount))
-    self.image.set_colorkey(WHITE)
+    def set_bomb_image(self, x, y, l, w, scaleAmount, spritesheet):
+        """
+        This function will set the image of the bomb for the particular stage of the bomb explosion animation.
+        """
+        self.image = pygame.transform.scale(spritesheet.get_image(x, y, l, w), (scaleAmount, scaleAmount))
+        self.image.set_colorkey(WHITE)
 
 
 def drop_bomb(player, bombspritesheet, otherSprites, bomb_set):
+    """
+    This function will drop a bomb sprite under a player. It only allows a certain
+    amount of bomb drops in a certaain time frame. The bombs will always be placed in
+    the center of a tile. This is so that the explosions from the bomb stay in the correct rows
+    and columns.
+    """
+    player.placingBomb = True
     now = pygame.time.get_ticks()
     # Drop a bomb only if sufficient amount of time has passed since the last bomb was dropped
-    if now - player.lastBombPlacementTime > 2000 and player.place_bomb():
+    if now - player.lastBombPlacementTime > 2000 and player.placingBomb:
         # Update the player's last bomb drop time
         player.lastBombPlacementTime = now
         # Create a new bomb object and add to the bomb set and sprites list

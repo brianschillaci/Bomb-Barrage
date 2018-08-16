@@ -1,6 +1,6 @@
 TITLE = "Bomberman"
-WIDTH = 800
-HEIGHT = 800
+WIDTH = 480
+HEIGHT = 416
 FPS = 60
 RESOURCE_FOLDER = "res"
 SPRITESHEET = "bombermansprites.png"
@@ -15,9 +15,9 @@ LEVEL_2_THEME = "config.board/level2.cfg"
 BOMB_DETONATION_TIME = 400
 
 # The lower the number, the faster the animation
-ANIMATION_SPEED = 90
+ANIMATION_SPEED = 100
 
-MOVEMENT_DISTANCE = 8
+MOVEMENT_DISTANCE = 4
 
 # define colors
 WHITE = (255, 255, 255)

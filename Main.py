@@ -9,6 +9,12 @@ from sprites.Players import Player
 from sprites.Explosions import SuperExplosion
 from util import CollisionUtil
 from sprites import Spritesheet
+import os
+
+# This code will center the window on the screen of a 1920x1080p monitor
+x = 720
+y = 332
+os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (x, y)
 
 # Initialization function needed by Pygame
 pygame.init()
@@ -51,8 +57,9 @@ carryOn = True
 # Clock for the game, helps with timing of animations like bomb explosion
 clock = pygame.time.Clock()
 
-# Set of all active sprites, that will be drawn each frame
+# Set of all player sprites
 playerSprites = pygame.sprite.Group()
+playerHitboxes = pygame.sprite.Group()
 
 explosions = pygame.sprite.Group()
 
@@ -60,9 +67,10 @@ bombs = pygame.sprite.Group()
 
 # Creation of the players in the game
 player1 = Player(33, 50)
-
-# Adding player1 to the active list of all sprites
+# Adding player1 to the player sprite group as well as
+# its hitbox to the playerhitbox group
 playerSprites.add(player1)
+playerHitboxes.add(player1.hitbox)
 
 # Set of all active bombs
 bomb_set = set()
@@ -91,6 +99,9 @@ img_dir = path.join(x, RESOURCE_FOLDER)
 spritesheet = Spritesheet.Spritesheet(path.join(img_dir, SPRITESHEET))
 bombspritesheet = Spritesheet.Spritesheet(path.join(img_dir, BOMBSPRITESHEET))
 
+# This is the main game loop. In this loop, there will be collision checking, user input handling
+# (Ex: movement, dropping bombs), and game logic (Ex: dropping bombs, losing lives, or picking up powerups,
+# determining a winner).
 while carryOn:
     time = clock.tick(60)
     # Close the game if someone exits the screen.
@@ -101,18 +112,42 @@ while carryOn:
             if event.key == pygame.K_x:
                 carryOn = False
 
+    # Updating the non-sprite board images for each board level
     level0.update_non_board_sprites()
-
     level1.update_non_board_sprites()
-
     level2.update_non_board_sprites()
 
-    # check for collisions in all the four corners of the screen
+    # Updating the hitboxes for all the players in the game.
+    # Also, updating the hitboxes in the player hitbox sprite group.
+    for player in playerSprites:
+        player.hitbox.update_rect(player, player.rect.width - 5, player.rect.height / 4)
+    CollisionUtil.update_player_hitboxes(playerHitboxes)
+
+    # Checking for collisions with the walls of the game
     collission_1 = pygame.sprite.spritecollideany(wall_1, playerSprites)
     collission_2 = pygame.sprite.spritecollideany(wall_2, playerSprites)
     collission_3 = pygame.sprite.spritecollideany(wall_3, playerSprites)
     collission_4 = pygame.sprite.spritecollideany(wall_4, playerSprites)
 
+    # Collisions between players and explosions - getting the collisions and then updating the players lives
+    # that got hit
+    playersAndExplosions = pygame.sprite.groupcollide(playerHitboxes, explosions, False, False)
+    for hitbox in playersAndExplosions:
+        hitbox.player.isInExplosionAnimation = True
+    CollisionUtil.update_player_lives(playerSprites, time)
+
+    # This loop will remove players and their hitboxes if they are dead. Players are dead when their lives get to 0
+    for player in playerSprites:
+        if player.is_dead():
+            # Find this player's hitbox and remove it
+            for hitbox in playerHitboxes:
+                if hitbox.player is player:
+                    playerHitboxes.remove(hitbox)
+                    break
+            # Remove this player from the game
+            playerSprites.remove(player)
+
+    # Collisions between breakable rocks and explosions - these rocks need to be removed
     breakableRocksAndExplosions = pygame.sprite.groupcollide(breakableRocks, explosions, True, False)
 
     # Get the key that was pressed by the user.
@@ -165,57 +200,50 @@ while carryOn:
 
     explosions_to_remove.clear()
 
-    # If else statements for all the possible user inputs, for both movement and combat
+    # Section for handling user input, for both movement and combat
     # The user can use WASD or the arrow keys in order to move their character
     if keys[pygame.K_LEFT] or keys[pygame.K_a]:
         if collission_2 is not None:
-            player1.walk_left()
+            player1.animate_player(pygame.K_LEFT)
         else:
             player1.rect.x -= MOVEMENT_DISTANCE
-            CollisionUtil.fix_player_collisions(player1, gameBoardSpriteGroups, 'left')
-            player1.walk_left()
+            CollisionUtil.fix_player_collisions(player1, gameBoardSpriteGroups, pygame.K_LEFT)
+            player1.animate_player(pygame.K_LEFT)
         if keys[pygame.K_SPACE]:
             drop_bomb(player1, bombspritesheet, bombs, bomb_set)
     elif keys[pygame.K_RIGHT] or keys[pygame.K_d]:
         if collission_4 is not None:
-            player1.walk_right()
+            player1.animate_player(pygame.K_RIGHT)
         else:
             player1.rect.x += MOVEMENT_DISTANCE
-            CollisionUtil.fix_player_collisions(player1, gameBoardSpriteGroups, 'right')
-            player1.walk_right()
+            CollisionUtil.fix_player_collisions(player1, gameBoardSpriteGroups, pygame.K_RIGHT)
+            player1.animate_player(pygame.K_RIGHT)
         if keys[pygame.K_SPACE]:
             drop_bomb(player1, bombspritesheet, bombs, bomb_set)
     elif keys[pygame.K_UP] or keys[pygame.K_w]:
         if collission_1 is not None:
-            player1.walk_forward()
+            player1.animate_player(pygame.K_UP)
         else:
             player1.rect.y -= MOVEMENT_DISTANCE
-            CollisionUtil.fix_player_collisions(player1, gameBoardSpriteGroups, 'up')
-            player1.walk_forward()
+            CollisionUtil.fix_player_collisions(player1, gameBoardSpriteGroups, pygame.K_UP)
+            player1.animate_player(pygame.K_UP)
         if keys[pygame.K_SPACE]:
             drop_bomb(player1, bombspritesheet, bombs, bomb_set)
     elif keys[pygame.K_DOWN] or keys[pygame.K_s]:
         if collission_3 is not None:
-            player1.walk_backward()
-        else: 
+            player1.animate_player(pygame.K_DOWN)
+        else:
             player1.rect.y += MOVEMENT_DISTANCE
-            CollisionUtil.fix_player_collisions(player1, gameBoardSpriteGroups, 'down')
-            player1.walk_backward()
+            CollisionUtil.fix_player_collisions(player1, gameBoardSpriteGroups, pygame.K_DOWN)
+            player1.animate_player(pygame.K_DOWN)
         if keys[pygame.K_SPACE]:
             drop_bomb(player1, bombspritesheet, bombs, bomb_set)
     elif keys[pygame.K_SPACE]:
         drop_bomb(player1, bombspritesheet, bombs, bomb_set)
     else:
-        player1.walking = False
         player1.placingBomb = False
-        player1.animate_player()
+        player1.animate_player(None)
 
-    # These 4 statements will redraw the game, both the background and the sprites on top of the background
-    unbreakableRocks.update()
-    breakableRocks.update()
-    bombs.update()
-    explosions.update()
-    playerSprites.update()
     pygame.display.flip()
     screen.fill(BLACK)
     clock.tick(60)

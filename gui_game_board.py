@@ -111,7 +111,6 @@ class GUIGameBoard(game_board.GameBoard):
         Initializes the images for each of the board elements.
         :return: void
         """
-        print(self.box_drawing_map.items())
         for entry in self.box_drawing_map.items():
             if entry[1][0] == "img":
                 img_path = entry[1][1]
