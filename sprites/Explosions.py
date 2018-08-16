@@ -3,6 +3,12 @@ from Settings import WHITE
 
 
 class ExplosionImage:
+    """
+    Take in the x and y position of the location of an image in a spritesheet as
+    well as whether the image needs to be rotated. The constructor then cuts the
+    image from the spritesheet and scales it to 32 x 32 for display. After
+    initialization, set an Explosion.image to be self.image for final display.
+    """
     def __init__(self, sprite_x, sprite_y, rotate, spriteSheet):
         self.sprite_x = sprite_x
         self.sprite_y = sprite_y
@@ -115,9 +121,16 @@ class SuperExplosion:
             self.explosionList.append(cexp)
             self.toRemoveAtEnd.append(cexp)
 
+            # Build explosion path from bomb center towards the right.
             self.build_explosion_path(32, 0, True, cexp, blockers)
+
+            # Build explosion path from bomb center towards the left.
             self.build_explosion_path(-32, 0, True, cexp, blockers)
+
+            # Build explosion path from bomb center towards the bottom.
             self.build_explosion_path(0, 32, False, cexp, blockers)
+
+            # Build explosion path from bomb center towards the top.
             self.build_explosion_path(0, -32, False, cexp, blockers)
 
             return True
