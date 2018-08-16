@@ -50,6 +50,9 @@ class Player(pygame.sprite.Sprite):
         # Time since last frame update - this allows us to control how fast the animations move
         self.last_update = 0
 
+        # Size of bomb to start, bomberman has no powerups initially.
+        self.explosion_size = 20
+
         # Getting the spritesheet file for this player - res is the folder it is in, SPRITESHEET is the filename
         self.dir = path.dirname(__file__)
         parent = path.join(self.dir, path.pardir)
