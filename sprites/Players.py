@@ -7,6 +7,9 @@ from sprites.Spritesheet import Spritesheet
 
 
 class Player(pygame.sprite.Sprite):
+    """
+    This is the class for a player object. There should be a max of 4 players in a game.
+    """
     # Lists of frames for the different animations for the player object
     standing_frames: List[None]
     walk_frames_r: List[None]
@@ -21,17 +24,22 @@ class Player(pygame.sprite.Sprite):
         # Calling super constructor for the Sprite class, since we are extending the Sprite class
         pygame.sprite.Sprite.__init__(self)
 
+        # Amount of times the player can get hit before dying
         self.lives = 1
 
-        self.isInExplosionAnimation = False
+        # Last direction the player moved
+        self.lastMovementDirection = None
 
-        # Boolean values for current states of action for this player
-        self.walking = False
-        self.walkingLeft = False
-        self.walkingRight = False
-        self.walkingForward = False
-        self.walkingBackward = False
+        # Whether the player is plaacing a bomb or not
         self.placingBomb = False
+
+        # Time for an explosion animation to occur after hitting the player
+        # Needed so that the player's lives are only subtracted after the explosion animation is done.
+        self.explosionTime = 90
+
+        # Set to true if this player was hit by an explosion and
+        # is waiting for the explosion to be done before subtracting from its number of lives
+        self.isInExplosionAnimation = False
 
         # Time that the last bomb was placed, this allows us to control the amount of time in between bomb placements.
         self.lastBombPlacementTime = -2000
@@ -61,6 +69,8 @@ class Player(pygame.sprite.Sprite):
         self.rect.x = startX
         self.rect.y = startY
 
+        # The hitbox sprite for this player. This sprite will need to be updated as the player moves. This is needed for
+        # some collision detection since some collisions need a smaller rectangle for the collision.
         self.hitbox = PlayerHitbox(self, self.rect.width / 2, self.rect.height / 5)
 
     def load_player_images(self):
@@ -106,89 +116,58 @@ class Player(pygame.sprite.Sprite):
         for frame in self.walk_frames_back:
             frame.set_colorkey(WHITE)
 
-    # End of load_images() function
-
-    def animate_player(self):
+    def animate_player(self, movementDirection):
         """
-        This function will animate the movement/non-movement of a player object.
-        :return: No return.
+        This function will animate the movement/non-movement of a player object. If the player is not moving,
+        it will use that last movement direction to pick which standing frame to use.
         """
         now = pygame.time.get_ticks()
         # Display the current frame for the walking animation.
-        if self.walking:
+        if movementDirection is not None:
+            self.lastMovementDirection = movementDirection
             # Only update the frame and move the player if a certain amount of time has passed.
             # This will allow us to control the speed of the animation.
             # Change ANIMATION_SPEED in Settings.py in order to see the effect.
             if now - self.last_update > ANIMATION_SPEED:
                 self.last_update = now
-                if self.walkingRight:
+                if movementDirection is pygame.K_RIGHT:
                     # Calculate the index of the next frame to display in the animaation.
                     self.current_frame = (self.current_frame + 1) % len(self.walk_frames_r)
                     # Update the image to the current frame of the animation.
                     self.image = self.walk_frames_r[self.current_frame]
                     # Move the underlying rectangle of which the image of the player will be drawn onto.
-                elif self.walkingLeft:
+                elif movementDirection is pygame.K_LEFT:
                     self.current_frame = (self.current_frame + 1) % len(self.walk_frames_l)
                     self.image = self.walk_frames_l[self.current_frame]
-                elif self.walkingForward:
+                elif movementDirection is pygame.K_UP:
                     self.current_frame = (self.current_frame + 1) % len(self.walk_frames_forward)
                     self.image = self.walk_frames_forward[self.current_frame]
-                elif self.walkingBackward:
+                elif movementDirection is pygame.K_DOWN:
                     self.current_frame = (self.current_frame + 1) % len(self.walk_frames_back)
                     self.image = self.walk_frames_back[self.current_frame]
-            self.walking = False
         # Display the frame for if the player is standing still
-        elif not self.walking:
+        else:
             self.last_update = now
-            if self.walkingRight:
+            if self.lastMovementDirection is pygame.K_RIGHT:
                 self.current_frame = 1
-            elif self.walkingLeft:
+            elif self.lastMovementDirection is pygame.K_LEFT:
                 self.current_frame = 2
-            elif self.walkingForward:
+            elif self.lastMovementDirection is pygame.K_UP:
                 self.current_frame = 3
-            elif self.walkingBackward:
+            elif self.lastMovementDirection is pygame.K_DOWN:
                 self.current_frame = 0
             self.image = self.standing_frames[self.current_frame]
 
-    def walk_right(self):
-        self.reset_walking_booleans()
-        self.walking = True
-        self.walkingRight = True
-        self.animate_player()
-
-    def walk_forward(self):
-        self.reset_walking_booleans()
-        self.walking = True
-        self.walkingForward = True
-        self.animate_player()
-
-    def walk_left(self):
-        self.reset_walking_booleans()
-        self.walking = True
-        self.walkingLeft = True
-        self.animate_player()
-
-    def walk_backward(self):
-        self.reset_walking_booleans()
-        self.walking = True
-        self.walkingBackward = True
-        self.animate_player()
-
-    def reset_walking_booleans(self):
-        self.walking = False
-        self.walkingLeft = False
-        self.walkingRight = False
-        self.walkingForward = False
-        self.walkingBackward = False
-        self.placingBomb = False
-
-    def place_bomb(self):
-        self.reset_walking_booleans()
-        self.placingBomb = True
-        return True
-
     def is_alive(self):
+        """
+        Checks if a player is still alive, meaning that the player has more than 0 lives.
+        :return: lives > 0
+        """
         return self.lives > 0
 
     def is_dead(self):
+        """
+        Checks if a player is still dead, meaning that the player has less or equal to 0 lives.
+        :return: lives <= 0
+        """
         return self.lives <= 0
