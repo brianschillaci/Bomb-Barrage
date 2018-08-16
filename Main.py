@@ -7,7 +7,7 @@ from sprites.Bombs import drop_bomb
 from sprites.MapElements import Wall, UnbreakableRock, BreakableRock
 from sprites.Players import Player
 from sprites.Explosions import SuperExplosion
-from util import CollisionUtil
+from util import CollisionUtil, Animations
 from sprites import Spritesheet
 import os
 
@@ -163,7 +163,7 @@ while carryOn:
 
     # Check if any bombs on the screen have expired and are ready to explode.
     for bomb in bomb_set:
-        bombReadyToExplode = bomb.animate(time, bombspritesheet)
+        bombReadyToExplode = Animations.animate_time_limit(bomb, 125, bomb.images)
         if bombReadyToExplode:
             bombs_to_remove.add(bomb)
 

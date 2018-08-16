@@ -4,6 +4,7 @@ import pygame
 from Settings import SPRITESHEET, RESOURCE_FOLDER, ANIMATION_SPEED, WHITE
 from sprites.Hitboxes import PlayerHitbox
 from sprites.Spritesheet import Spritesheet
+from util import Animations
 
 
 class Player(pygame.sprite.Sprite):
@@ -14,8 +15,8 @@ class Player(pygame.sprite.Sprite):
     standing_frames: List[None]
     walk_frames_r: List[None]
     walk_frames_l: List[None]
-    walk_frames_forward: List[None]
-    walk_frames_back: List[None]
+    walk_frames_up: List[None]
+    walk_frames_down: List[None]
 
     def __init__(self, startX, startY):
         """
@@ -103,17 +104,17 @@ class Player(pygame.sprite.Sprite):
             frame.set_colorkey(WHITE)
 
         # Images for the walking forward animation.
-        self.walk_frames_forward = [pygame.transform.scale(self.spritesheet.get_image(0, 7, 15, 21), (30, 42)),
-                                    pygame.transform.scale(self.spritesheet.get_image(16, 7, 15, 23), (30, 46)),
-                                    pygame.transform.scale(self.spritesheet.get_image(32, 7, 15, 23), (30, 46))]
-        for frame in self.walk_frames_forward:
+        self.walk_frames_up = [pygame.transform.scale(self.spritesheet.get_image(0, 7, 15, 21), (30, 42)),
+                               pygame.transform.scale(self.spritesheet.get_image(16, 7, 15, 23), (30, 46)),
+                               pygame.transform.scale(self.spritesheet.get_image(32, 7, 15, 23), (30, 46))]
+        for frame in self.walk_frames_up:
             frame.set_colorkey(WHITE)
 
         # Images for the walking backward animation.
-        self.walk_frames_back = [pygame.transform.scale(self.spritesheet.get_image(0, 69, 15, 23), (30, 46)),
+        self.walk_frames_down = [pygame.transform.scale(self.spritesheet.get_image(0, 69, 15, 23), (30, 46)),
                                  pygame.transform.scale(self.spritesheet.get_image(16, 69, 15, 23), (30, 46)),
                                  pygame.transform.scale(self.spritesheet.get_image(32, 69, 15, 23), (30, 46))]
-        for frame in self.walk_frames_back:
+        for frame in self.walk_frames_down:
             frame.set_colorkey(WHITE)
 
     def animate_player(self, movementDirection):
@@ -128,23 +129,14 @@ class Player(pygame.sprite.Sprite):
             # Only update the frame and move the player if a certain amount of time has passed.
             # This will allow us to control the speed of the animation.
             # Change ANIMATION_SPEED in Settings.py in order to see the effect.
-            if now - self.last_update > ANIMATION_SPEED:
-                self.last_update = now
-                if movementDirection is pygame.K_RIGHT:
-                    # Calculate the index of the next frame to display in the animaation.
-                    self.current_frame = (self.current_frame + 1) % len(self.walk_frames_r)
-                    # Update the image to the current frame of the animation.
-                    self.image = self.walk_frames_r[self.current_frame]
-                    # Move the underlying rectangle of which the image of the player will be drawn onto.
-                elif movementDirection is pygame.K_LEFT:
-                    self.current_frame = (self.current_frame + 1) % len(self.walk_frames_l)
-                    self.image = self.walk_frames_l[self.current_frame]
-                elif movementDirection is pygame.K_UP:
-                    self.current_frame = (self.current_frame + 1) % len(self.walk_frames_forward)
-                    self.image = self.walk_frames_forward[self.current_frame]
-                elif movementDirection is pygame.K_DOWN:
-                    self.current_frame = (self.current_frame + 1) % len(self.walk_frames_back)
-                    self.image = self.walk_frames_back[self.current_frame]
+            if movementDirection is pygame.K_RIGHT:
+                Animations.animate(self, ANIMATION_SPEED, self.walk_frames_r)
+            elif movementDirection is pygame.K_LEFT:
+                Animations.animate(self, ANIMATION_SPEED, self.walk_frames_l)
+            elif movementDirection is pygame.K_UP:
+                Animations.animate(self, ANIMATION_SPEED, self.walk_frames_up)
+            elif movementDirection is pygame.K_DOWN:
+                Animations.animate(self, ANIMATION_SPEED, self.walk_frames_down)
         # Display the frame for if the player is standing still
         else:
             self.last_update = now

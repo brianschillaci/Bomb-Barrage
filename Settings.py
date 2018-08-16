@@ -12,7 +12,7 @@ LEVEL_0_THEME = "config.board/level0.cfg"
 LEVEL_1_THEME = "config.board/level1.cfg"
 LEVEL_2_THEME = "config.board/level2.cfg"
 
-BOMB_DETONATION_TIME = 400
+BOMB_DETONATION_TIME = 2000
 
 # The lower the number, the faster the animation
 ANIMATION_SPEED = 100
