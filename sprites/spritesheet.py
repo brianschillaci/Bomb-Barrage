@@ -9,7 +9,7 @@ class Spritesheet:
         :param filename: Filename string to create pygame image for this Spritesheet/image of sprites.
         """
         # Loading the full spritesheet image and storing it as a variable in this object
-        self.spritesheet = pygame.image.load(filename).convert()
+        self.sheet_image = pygame.image.load(filename).convert()
 
     def get_image(self, x: object, y: object, width: object, height: object) -> object:
         """
@@ -21,6 +21,6 @@ class Spritesheet:
         :return:
         """
         image = pygame.Surface((width, height))
-        image.blit(self.spritesheet, (0, 0), (x, y, width, height))
+        image.blit(self.sheet_image, (0, 0), (x, y, width, height))
         image = pygame.transform.scale(image, (width, height))
         return image
