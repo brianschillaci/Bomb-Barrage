@@ -1,6 +1,8 @@
-import pygame
 import os
-from contants import WIDTH, HEIGHT, TITLE
+
+import pygame
+
+from constants import WIDTH, HEIGHT, TITLE
 from modes.lan_mode import lan_mode
 
 # Center the window on the screen of a 1920x1080p monitor

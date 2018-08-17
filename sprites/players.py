@@ -1,6 +1,8 @@
 from typing import List
+
 import pygame
-from contants import PLAYER_ANIMATION_SPEED, WHITE, PLAYER_MOVEMENT_DISTANCE, PLAYER_EXPLOSION_TIME
+
+from constants import PLAYER_ANIMATION_SPEED, WHITE, PLAYER_MOVEMENT_DISTANCE, PLAYER_EXPLOSION_TIME
 from sprites.bombs import Bomb
 from sprites.hitboxes import PlayerHitbox
 from util import animation_util, collision_util
@@ -128,7 +130,7 @@ class Player(pygame.sprite.Sprite):
             self.lastMovementDirection = movement_direction
             # Only update the frame and move the player if a certain amount of time has passed.
             # This will allow us to control the speed of the animation.
-            # Change ANIMATION_SPEED in contants.py in order to see the effect.
+            # Change ANIMATION_SPEED in constants.py in order to see the effect.
             if movement_direction is pygame.K_RIGHT:
                 animation_util.animate(self, PLAYER_ANIMATION_SPEED, self.walk_frames_r)
             elif movement_direction is pygame.K_LEFT:
@@ -150,14 +152,13 @@ class Player(pygame.sprite.Sprite):
                 self.current_frame = 0
             self.image = self.standing_frames[self.current_frame]
 
-    def handle_input(self, walls, collision_sprite_groups, bomb_sprite_sheet, all_bombs, active_bomb_set, keys):
+    def handle_input(self, walls, collision_sprite_groups, bomb_sprite_sheet, all_bombs, active_bomb_set, keys,
+                     all_players):
         # Checking for collisions with the walls of the game
         collision_1 = pygame.sprite.collide_rect(walls[0], self)
         collision_2 = pygame.sprite.collide_rect(walls[1], self)
         collision_3 = pygame.sprite.collide_rect(walls[2], self)
         collision_4 = pygame.sprite.collide_rect(walls[3], self)
-
-        self.update_active_bombs()
 
         # Handle the input keys for this player
         if keys[pygame.K_LEFT] or keys[pygame.K_a]:
@@ -169,7 +170,7 @@ class Player(pygame.sprite.Sprite):
                 collision_util.fix_player_bomb_collision(self, all_bombs, pygame.K_LEFT)
                 self.animate_player(pygame.K_LEFT)
             if keys[pygame.K_SPACE]:
-                self.drop_bomb(bomb_sprite_sheet, all_bombs, active_bomb_set)
+                self.drop_bomb(bomb_sprite_sheet, all_bombs, active_bomb_set, all_players)
         elif keys[pygame.K_RIGHT] or keys[pygame.K_d]:
             if collision_4 != 0:
                 self.animate_player(pygame.K_RIGHT)
@@ -179,7 +180,7 @@ class Player(pygame.sprite.Sprite):
                 collision_util.fix_player_bomb_collision(self, all_bombs, pygame.K_RIGHT)
                 self.animate_player(pygame.K_RIGHT)
             if keys[pygame.K_SPACE]:
-                self.drop_bomb(bomb_sprite_sheet, all_bombs, active_bomb_set)
+                self.drop_bomb(bomb_sprite_sheet, all_bombs, active_bomb_set, all_players)
         elif keys[pygame.K_UP] or keys[pygame.K_w]:
             if collision_1 != 0:
                 self.animate_player(pygame.K_UP)
@@ -189,7 +190,7 @@ class Player(pygame.sprite.Sprite):
                 collision_util.fix_player_bomb_collision(self, all_bombs, pygame.K_UP)
                 self.animate_player(pygame.K_UP)
             if keys[pygame.K_SPACE]:
-                self.drop_bomb(bomb_sprite_sheet, all_bombs, active_bomb_set)
+                self.drop_bomb(bomb_sprite_sheet, all_bombs, active_bomb_set, all_players)
         elif keys[pygame.K_DOWN] or keys[pygame.K_s]:
             if collision_3 != 0:
                 self.animate_player(pygame.K_DOWN)
@@ -199,14 +200,14 @@ class Player(pygame.sprite.Sprite):
                 collision_util.fix_player_bomb_collision(self, all_bombs, pygame.K_DOWN)
                 self.animate_player(pygame.K_DOWN)
             if keys[pygame.K_SPACE]:
-                self.drop_bomb(bomb_sprite_sheet, all_bombs, active_bomb_set)
+                self.drop_bomb(bomb_sprite_sheet, all_bombs, active_bomb_set, all_players)
         elif keys[pygame.K_SPACE]:
-            self.drop_bomb(bomb_sprite_sheet, all_bombs, active_bomb_set)
+            self.drop_bomb(bomb_sprite_sheet, all_bombs, active_bomb_set, all_players)
         else:
             self.placingBomb = False
             self.animate_player(None)
 
-    def drop_bomb(self, bombspritesheet, all_bombs, all_bombs_set):
+    def drop_bomb(self, bombspritesheet, all_bombs, all_bombs_set, all_players):
         """
         This function will drop a bomb sprite under a player. It only allows a certain
         amount of bomb drops in a certain time frame. The bombs will always be placed in
@@ -220,20 +221,13 @@ class Player(pygame.sprite.Sprite):
             # Update the player's last bomb drop time
             self.lastBombPlacementTime = now
             # Create a new bomb object and add to the all bombs set, all bombs sprite group, and self bomb group
-            bomb = Bomb(self, bombspritesheet)
+            bomb = Bomb(self, bombspritesheet, all_players)
             all_bombs.add(bomb)
             all_bombs_set.add(bomb)
             self.active_bombs.add(bomb)
             # Update the location of the bomb to the (x,y) of where the player dropped it
             bomb.rect.x = (self.rect.centerx // 32) * 32
             bomb.rect.y = ((self.rect.bottom - 5) // 32) * 32
-
-    def update_active_bombs(self):
-        for bomb in self.active_bombs:
-            self.hitbox.update_rect(self, self.rect.width, self.rect.height)
-            collision = pygame.sprite.collide_rect(self.hitbox, bomb)
-            if collision == 0:
-                bomb.playerAllowedToCollide = None
 
     def is_alive(self):
         """

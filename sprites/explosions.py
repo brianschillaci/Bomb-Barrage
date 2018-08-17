@@ -1,5 +1,6 @@
 import pygame
-from contants import WHITE
+
+from constants import WHITE
 
 
 class ExplosionImage:

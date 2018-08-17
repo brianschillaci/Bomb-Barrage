@@ -1,12 +1,14 @@
 from typing import List
+
 import pygame
-from contants import WHITE
+
+from constants import WHITE
 
 
 class Bomb(pygame.sprite.Sprite):
     images: List[None]
 
-    def __init__(self, player, spritesheet):
+    def __init__(self, player, spritesheet, all_players):
         """
         Constructor for a Bomb object.
         Initializes the bomb image, time, and background pygame.rect object.
@@ -17,8 +19,11 @@ class Bomb(pygame.sprite.Sprite):
         # Player that dropped this bomb
         self.player = player
 
-        # Initially set to the current player, once the player moves off this bomb, set to None
-        self.playerAllowedToCollide = self.player
+        self.players_allowed_to_collide = None
+        player_set = set()
+        for player in all_players:
+            player_set.add(player)
+        self.players_allowed_to_collide = player_set
 
         # Load images and pre-setup for animation
         self.load_bomb_images(spritesheet)
@@ -41,3 +46,12 @@ class Bomb(pygame.sprite.Sprite):
 
         for frame in self.images:
             frame.set_colorkey(WHITE)
+
+
+def update_active_bombs(players, all_bombs):
+    for bomb in all_bombs:
+        for player in players:
+            player.hitbox.update_rect(player, player.rect.width, player.rect.height / 4)
+            collision = pygame.sprite.collide_rect(player.hitbox, bomb)
+            if collision == 0 and bomb.players_allowed_to_collide.__contains__(player):
+                bomb.players_allowed_to_collide.remove(player)

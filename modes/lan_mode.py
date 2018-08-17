@@ -1,12 +1,15 @@
-import pygame
 from os import path
+
+import pygame
+
 from board.gui_game_board import GUIGameBoard as GBoard
-from contants import WIDTH, HEIGHT, \
+from constants import WIDTH, HEIGHT, \
     LEVEL_0_BRD, LEVEL_1_BRD, LEVEL_2_BRD, LEVEL_0_THEME, LEVEL_1_THEME, LEVEL_2_THEME, BLACK, \
     RESOURCE_FOLDER, BOMBSPRITESHEET, PLAYERSPRITESHEET
+from sprites import bombs
+from sprites.explosions import SuperExplosion
 from sprites.map_elements import Wall, UnbreakableRock, BreakableRock
 from sprites.players import Player
-from sprites.explosions import SuperExplosion
 from sprites.spritesheet import Spritesheet
 from util import collision_util, animation_util
 
@@ -163,10 +166,14 @@ def lan_mode(screen):
             all_explosions_set -= finished_explosions_to_remove
             finished_explosions_to_remove.clear()
 
+        # Update active bombs to make sure collisions with bombs are working properly
+        bombs.update_active_bombs(player_sprites, all_bombs)
+
         # Section for handling user input, for both movement and combat
         # The user can use WASD or the arrow keys in order to move their character
         for player in player_sprites:
-            player.handle_input(walls_list, level2_sprite_groups, bomb_sprite_sheet, all_bombs, all_bombs_set, keys)
+            player.handle_input(walls_list, level2_sprite_groups, bomb_sprite_sheet, all_bombs, all_bombs_set, keys,
+                                player_sprites)
 
         # Updating the non-sprite board images for each board level
         level0.update_non_board_sprites()

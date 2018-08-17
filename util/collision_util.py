@@ -1,6 +1,6 @@
 import pygame
 
-from contants import PLAYER_EXPLOSION_TIME
+from constants import PLAYER_EXPLOSION_TIME
 
 
 def fix_player_movement_collision(player, collision_list, movement_direction):
@@ -48,7 +48,7 @@ def fix_player_bomb_collision(player, bombs, movement_direction):
         # For each object that the player collides with, move that player to the correct
         # position depending on the movement direction
         for bomb in collisions:
-            if bomb.playerAllowedToCollide is player:
+            if bomb.players_allowed_to_collide.__contains__(player):
                 continue
             if movement_direction is pygame.K_LEFT:
                 player.rect.left = bomb.rect.right
