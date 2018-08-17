@@ -19,6 +19,7 @@ class Bomb(pygame.sprite.Sprite):
         # Player that dropped this bomb
         self.player = player
 
+        # Bombs are allowed to collide with everyone initially - players get removed from this set once they step off the bomb
         self.players_allowed_to_collide = None
         player_set = set()
         for player in all_players:
