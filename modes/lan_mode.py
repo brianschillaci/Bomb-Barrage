@@ -98,7 +98,6 @@ def lan_mode(screen):
                 is_game_running = False
 
         # Updating the hitboxes for all the players in the game.
-        # Also, updating the hitboxes in the player hitbox sprite group.
         for player in player_sprites:
             player.hitbox.update_rect(player, player.rect.width / 4, player.rect.height / 4)
 
