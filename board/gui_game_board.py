@@ -1,4 +1,4 @@
-import game_board
+from board import game_board
 import pygame
 
 
@@ -40,15 +40,15 @@ class GUIGameBoard(game_board.GameBoard):
 
         self.box_drawing_map = box_drawing_map
 
-    def initialize_board_sprites(self, spriteGroups, spriteClassMap):
+    def initialize_board_sprites(self, sprite_groups, sprite_class_map):
         """
-        This function will initialize the spriteGroups with sprites defined in the brd file.
+        This function will initialize the sprite_groups with sprites defined in the brd file.
         It won't create a sprite if the line in the cfg file says no_sprite_class.
         The sprite class name is retrieved from the 4th index.
         Its x and y coordinate are retrived from the location in the corresponding character in the brd file.
-        :param spriteGroups: List of sprite.Group()'s to add the gameboard sprites to, the sprite.group() to choose is
+        :param sprite_groups: List of sprite.Group()'s to add the gameboard sprites to, the sprite.group() to choose is
                              determined by the index given in the cfg file.
-        :param spriteClassMap: Map of string sprite class names to the actual class's object - used to call the
+        :param sprite_class_map: Map of string sprite class names to the actual class's object - used to call the
                                constructors of the sprites dynamically based on the sprite class string in the cfg file
         :return: void
         """
@@ -63,11 +63,11 @@ class GUIGameBoard(game_board.GameBoard):
                 # If this element has a sprite class associated with it, we need to create a sprite object for it
                 # and add it to the correct spriteGroup.
                 # The sprite groups are passed in as a list and their index is in the .cfg file.
-                # The spriteClassMap contains mapping between sprite objects and their string name.
+                # The sprite_class_map contains mapping between sprite objects and their string name.
                 # This is needed so we can instantiate these sprite objects calling their constructor.
-                spriteName = self.box_drawing_map[box][4]
-                spriteToAdd = spriteClassMap[spriteName](self.box_drawing_map[box][2], x, y)
-                spriteGroups[int(self.box_drawing_map[box][5])].add(spriteToAdd)
+                sprite_name = self.box_drawing_map[box][4]
+                sprite_to_add = sprite_class_map[sprite_name](self.box_drawing_map[box][2], x, y)
+                sprite_groups[int(self.box_drawing_map[box][5])].add(sprite_to_add)
 
     def update_non_board_sprites(self):
         """
