@@ -1,6 +1,6 @@
 import pygame
 
-from constants import PLAYER_EXPLOSION_TIME
+from constants import PLAYER_EXPLOSION_TIME, PLAYER_MOVEMENT_DISTANCE
 
 
 def fix_player_movement_collision(player, collision_list, movement_direction):
@@ -25,15 +25,57 @@ def fix_player_movement_collision(player, collision_list, movement_direction):
             # position depending on the movement direction
             for collision_object in collisions:
                 if movement_direction is pygame.K_LEFT:
+                    if player.hitbox.rect.midleft[1] < collision_object.rect.midright[1] - 8:
+                        player.rect.y -= PLAYER_MOVEMENT_DISTANCE
+                        if check_for_collision(player, collision_list) > 0:
+                            player.rect.y += PLAYER_MOVEMENT_DISTANCE
+                    elif player.hitbox.rect.midleft[1] > collision_object.rect.midright[1] + 8:
+                        player.rect.y += PLAYER_MOVEMENT_DISTANCE
+                        if check_for_collision(player, collision_list) > 0:
+                            player.rect.y -= PLAYER_MOVEMENT_DISTANCE
                     player.rect.left = collision_object.rect.right
                 elif movement_direction is pygame.K_RIGHT:
+                    if player.hitbox.rect.midright[1] < collision_object.rect.midleft[1] - 4:
+                        player.rect.y -= PLAYER_MOVEMENT_DISTANCE
+                        if check_for_collision(player, collision_list) > 0:
+                            player.rect.y += PLAYER_MOVEMENT_DISTANCE
+                    elif player.hitbox.rect.midright[1] < collision_object.rect.midleft[1] + 4:
+                        player.rect.y += PLAYER_MOVEMENT_DISTANCE
+                        if check_for_collision(player, collision_list) > 0:
+                            player.rect.y -= PLAYER_MOVEMENT_DISTANCE
                     player.rect.right = collision_object.rect.left
                 elif movement_direction is pygame.K_UP:
                     # When a player is walking up, they don't get stopped at their head,
                     # they get stopped at a smaller hit box near their feet
+                    if player.hitbox.rect.midbottom[0] < collision_object.rect.midbottom[0] - 4:
+                        player.rect.x -= PLAYER_MOVEMENT_DISTANCE
+                        if check_for_collision(player, collision_list) > 0:
+                            player.rect.x += PLAYER_MOVEMENT_DISTANCE
+                    elif player.hitbox.rect.midbottom[0] > collision_object.rect.midbottom[0] + 4:
+                        player.rect.x += PLAYER_MOVEMENT_DISTANCE
+                        if check_for_collision(player, collision_list) > 0:
+                            player.rect.x -= PLAYER_MOVEMENT_DISTANCE
                     player.rect.bottom = collision_object.rect.bottom + player.hitbox.rect.height
                 else:
+                    if player.rect.midbottom[0] < collision_object.rect.midbottom[0] - 4:
+                        player.rect.x -= PLAYER_MOVEMENT_DISTANCE
+                        if check_for_collision(player, collision_list) > 0:
+                            player.rect.x += PLAYER_MOVEMENT_DISTANCE
+                    elif player.rect.midbottom[0] > collision_object.rect.midbottom[0] + 4:
+                        player.rect.x += PLAYER_MOVEMENT_DISTANCE
+                        if check_for_collision(player, collision_list) > 0:
+                            player.rect.x -= PLAYER_MOVEMENT_DISTANCE
                     player.rect.bottom = collision_object.rect.top
+
+
+def check_for_collision(player, collision_list):
+    for objects in collision_list:
+        # Updating the hitbox for this player before checking for rock collisions
+        player.hitbox.update_rect(player, player.rect.width, player.rect.height / 4)
+
+        # Getting the collisions between the rocks and this player's hitbox
+        collisions = pygame.sprite.spritecollide(player.hitbox, objects, False)
+        return collisions.__len__()
 
 
 def fix_player_bomb_collision(player, bombs, movement_direction):

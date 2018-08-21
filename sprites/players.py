@@ -56,7 +56,7 @@ class Player(pygame.sprite.Sprite):
         self.last_update = 0
 
         # Size of bomb to start, bomberman has no powerups initially.
-        self.explosion_size = 1
+        self.explosion_size = 3
 
         self.spritesheet = player_sprite_sheet
 
@@ -166,8 +166,8 @@ class Player(pygame.sprite.Sprite):
                 self.animate_player(pygame.K_LEFT)
             else:
                 self.rect.x -= PLAYER_MOVEMENT_DISTANCE
-                collision_util.fix_player_movement_collision(self, collision_sprite_groups, pygame.K_LEFT)
                 collision_util.fix_player_bomb_collision(self, all_bombs, pygame.K_LEFT)
+                collision_util.fix_player_movement_collision(self, collision_sprite_groups, pygame.K_LEFT)
                 self.animate_player(pygame.K_LEFT)
             if keys[pygame.K_SPACE]:
                 self.drop_bomb(bomb_sprite_sheet, all_bombs, active_bomb_set, all_players)
@@ -176,8 +176,8 @@ class Player(pygame.sprite.Sprite):
                 self.animate_player(pygame.K_RIGHT)
             else:
                 self.rect.x += PLAYER_MOVEMENT_DISTANCE
-                collision_util.fix_player_movement_collision(self, collision_sprite_groups, pygame.K_RIGHT)
                 collision_util.fix_player_bomb_collision(self, all_bombs, pygame.K_RIGHT)
+                collision_util.fix_player_movement_collision(self, collision_sprite_groups, pygame.K_RIGHT)
                 self.animate_player(pygame.K_RIGHT)
             if keys[pygame.K_SPACE]:
                 self.drop_bomb(bomb_sprite_sheet, all_bombs, active_bomb_set, all_players)
@@ -186,8 +186,8 @@ class Player(pygame.sprite.Sprite):
                 self.animate_player(pygame.K_UP)
             else:
                 self.rect.y -= PLAYER_MOVEMENT_DISTANCE
+                collision_util.fix_player_bomb_collision(self, all_bombs, pygame.K_RIGHT)
                 collision_util.fix_player_movement_collision(self, collision_sprite_groups, pygame.K_UP)
-                collision_util.fix_player_bomb_collision(self, all_bombs, pygame.K_UP)
                 self.animate_player(pygame.K_UP)
             if keys[pygame.K_SPACE]:
                 self.drop_bomb(bomb_sprite_sheet, all_bombs, active_bomb_set, all_players)
@@ -196,8 +196,8 @@ class Player(pygame.sprite.Sprite):
                 self.animate_player(pygame.K_DOWN)
             else:
                 self.rect.y += PLAYER_MOVEMENT_DISTANCE
-                collision_util.fix_player_movement_collision(self, collision_sprite_groups, pygame.K_DOWN)
                 collision_util.fix_player_bomb_collision(self, all_bombs, pygame.K_DOWN)
+                collision_util.fix_player_movement_collision(self, collision_sprite_groups, pygame.K_DOWN)
                 self.animate_player(pygame.K_DOWN)
             if keys[pygame.K_SPACE]:
                 self.drop_bomb(bomb_sprite_sheet, all_bombs, active_bomb_set, all_players)
