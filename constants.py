@@ -1,4 +1,4 @@
-TITLE = "Bomb Arena"
+TITLE = "Bomb Barrage"
 WIDTH = 480
 HEIGHT = 416
 FPS = 60
