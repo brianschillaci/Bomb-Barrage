@@ -35,11 +35,11 @@ def fix_player_movement_collision(player, collision_list, movement_direction):
                             player.rect.y -= PLAYER_MOVEMENT_DISTANCE
                     player.rect.left = collision_object.rect.right
                 elif movement_direction is pygame.K_RIGHT:
-                    if player.hitbox.rect.midright[1] < collision_object.rect.midleft[1] - 8:
+                    if player.hitbox.rect.midright[1] < collision_object.rect.midleft[1] - 4:
                         player.rect.y -= PLAYER_MOVEMENT_DISTANCE
                         if check_for_collision(player, collision_list) > 0:
                             player.rect.y += PLAYER_MOVEMENT_DISTANCE
-                    elif player.hitbox.rect.midright[1] < collision_object.rect.midleft[1] + 8:
+                    elif player.hitbox.rect.midright[1] < collision_object.rect.midleft[1] + 4:
                         player.rect.y += PLAYER_MOVEMENT_DISTANCE
                         if check_for_collision(player, collision_list) > 0:
                             player.rect.y -= PLAYER_MOVEMENT_DISTANCE
